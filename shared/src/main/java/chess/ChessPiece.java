@@ -69,7 +69,12 @@ public class ChessPiece {
         Rule rule = switch (getPieceType()) {
             case BISHOP -> new Rule(true, new int[][]{{1, -1}, {-1, 1}, {-1, -1}, {1, 1}});
             case ROOK   -> new Rule(true, new int[][]{{1, 0}, {-1, 0}, {0, 1}, {0, -1}});
-            case KNIGHT -> new Rule(false, new int[][]{{2, 1}, {2, -1}, {-2, 1}});
+            case KNIGHT -> new Rule(false, new int[][]{
+                    {2, 1}, {2, -1}, // Two squares up, one square left/right
+                    {-2, 1}, {-2, -1}, // Two squares down, one square left/right
+                    {1, 2}, {1, -2}, // One square up, two squares left/right
+                    {-1, 2}, {-1, -2} // One square down, two squares left/right
+            });
             case QUEEN  -> new Rule(true, new int[][]{{1, -1}, {-1, 1}, {-1, -1}, {1, 1}});
             case KING   -> new Rule(false, new int[][]{
                     {1, -1}, {-1, 1}, {-1, -1}, {1, 1},  // Diagonal moves
