@@ -25,28 +25,37 @@ public class Rule {
         return Objects.hash(canRepeat, Arrays.deepHashCode(directions));
     }
 
+
     // Method to generate possible moves for the given piece on the board
     public Collection<ChessMove> getMoves(ChessBoard board, ChessPosition pos) {
         ArrayList<int[]> moves = new ArrayList<>();  // Use ArrayList to store {x, y} pairs
+        int currentX = pos.getRow();
+        int currentY = pos.getColumn();
+        ChessPiece pieceAtCurPosition = board.getPiece(new ChessPosition(pos.getRow(), pos.getColumn()));
 
         for (int[] direction : directions) {
             int dx = direction[0];
             int dy = direction[1];
 
-            int currentX = pos.getRow();
-            int currentY = pos.getColumn();
+            int tempX = pos.getRow();
+            int tempY = pos.getColumn();
 
             while (true) {
-                currentX += dx;
-                currentY += dy;
+                tempX += dx;
+                tempY += dy;
 
                 // Check if the new position is valid on the board
-                if (!board.isValidPosition(new ChessPosition(currentX, currentY))) {
+                if (!board.isValidPosition(new ChessPosition(tempX, tempY))) {
                     break;
                 }
 
+                ChessPiece pieceAtNewPosition = board.getPiece(new ChessPosition(tempX, tempY));
+                if (pieceAtNewPosition != null && pieceAtNewPosition.getTeamColor() == pieceAtCurPosition.getTeamColor()) {
+                    break;  // Stop if a teammate is in the way
+                }
+
                 // Add the move (new position) as {x, y} pair to the ArrayList
-                moves.add(new int[]{currentX, currentY});
+                moves.add(new int[]{tempX, tempY});
 
                 // If the piece cannot repeat moves in the same direction, stop here
                 if (!canRepeat) {

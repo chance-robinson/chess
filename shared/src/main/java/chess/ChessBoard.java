@@ -19,7 +19,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        squares[position.getRow()][position.getColumn()] = piece;
+        squares[position.getRow()-1][position.getColumn()-1] = piece;
     }
 
     /**
@@ -30,7 +30,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        return squares[position.getRow()][position.getColumn()];
+        return squares[position.getRow()-1][position.getColumn()-1];
     }
 
     /**
@@ -40,9 +40,9 @@ public class ChessBoard {
      * @return true if the position is within the bounds of the chessboard
      */
     public boolean isValidPosition(ChessPosition position) {
-        int row = position.getRow();
-        int column = position.getColumn();
-        return row >= 1 && row <= 8 && column >= 1 && column <= 8;
+        int row = position.getRow()-1;
+        int column = position.getColumn()-1;
+        return row >= 0 && row < 8 && column >= 0 && column < 8;
     }
 
     /**
