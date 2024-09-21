@@ -53,6 +53,11 @@ public class Rule {
                 if (pieceAtNewPosition != null && pieceAtNewPosition.getTeamColor() == pieceAtCurPosition.getTeamColor()) {
                     break;  // Stop if a teammate is in the way
                 }
+                if (pieceAtNewPosition != null && pieceAtNewPosition.getTeamColor() != pieceAtCurPosition.getTeamColor()) {
+                    moves.add(new int[]{tempX, tempY});
+                    break;
+                }
+
 
                 // Add the move (new position) as {x, y} pair to the ArrayList
                 moves.add(new int[]{tempX, tempY});
