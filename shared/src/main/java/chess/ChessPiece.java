@@ -75,7 +75,11 @@ public class ChessPiece {
                     {1, 2}, {1, -2}, // One square up, two squares left/right
                     {-1, 2}, {-1, -2} // One square down, two squares left/right
             });
-            case QUEEN  -> new Rule(true, new int[][]{{1, -1}, {-1, 1}, {-1, -1}, {1, 1}});
+            case QUEEN -> new Rule(true, new int[][]{
+                    {1, 0}, {-1, 0},  // Vertical Moves
+                    {0, 1}, {0, -1},  // Horizontal Moves
+                    {1, -1}, {-1, 1}, {-1, -1}, {1, 1}, // Diagonal moves
+            });
             case KING   -> new Rule(false, new int[][]{
                     {1, -1}, {-1, 1}, {-1, -1}, {1, 1},  // Diagonal moves
                     {1, 0}, {-1, 0}, {0, 1}, {0, -1}     // Cardinal directions: Up, Down, Right, Left
