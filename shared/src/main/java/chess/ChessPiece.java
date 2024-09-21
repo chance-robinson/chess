@@ -84,7 +84,8 @@ public class ChessPiece {
                     {1, -1}, {-1, 1}, {-1, -1}, {1, 1},  // Diagonal moves
                     {1, 0}, {-1, 0}, {0, 1}, {0, -1}     // Cardinal directions: Up, Down, Right, Left
             });
-            default -> null;
+            case PAWN   -> new Rule(false, new int[][]{{1,1}});
+            default -> null; // Default Case: PAWN
         };
 
         // Get the list of possible moves as an ArrayList<int[]>
