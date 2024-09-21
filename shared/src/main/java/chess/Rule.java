@@ -96,7 +96,15 @@ public class Rule {
         // Regular move
         if (board.isValidPosition(new ChessPosition(newRow, pos.getColumn())) &&
                 board.getPiece(new ChessPosition(newRow, pos.getColumn())) == null) {
-            chessMoves.add(new ChessMove(pos, new ChessPosition(newRow, pos.getColumn()), null));
+            // Check for promotion
+            if (newRow == 8 || newRow == 1) {
+                // Add promotion moves for each piece type
+                for (ChessPiece.PieceType promoPiece : new ChessPiece.PieceType[]{ChessPiece.PieceType.QUEEN, ChessPiece.PieceType.ROOK, ChessPiece.PieceType.BISHOP, ChessPiece.PieceType.KNIGHT}) {
+                    chessMoves.add(new ChessMove(pos, new ChessPosition(newRow, pos.getColumn()), promoPiece));
+                }
+            } else {
+                chessMoves.add(new ChessMove(pos, new ChessPosition(newRow, pos.getColumn()), null));
+            }
         }
 
         // First move double forward
@@ -105,7 +113,15 @@ public class Rule {
             if (board.isValidPosition(new ChessPosition(newRow, pos.getColumn())) &&
                     board.getPiece(new ChessPosition(newRow-direction, pos.getColumn())) == null &&
                     board.getPiece(new ChessPosition(newRow, pos.getColumn())) == null) {
-                chessMoves.add(new ChessMove(pos, new ChessPosition(newRow, pos.getColumn()), null));
+                // Check for promotion
+                if (newRow == 8 || newRow == 1) {
+                    // Add promotion moves for each piece type
+                    for (ChessPiece.PieceType promoPiece : new ChessPiece.PieceType[]{ChessPiece.PieceType.QUEEN, ChessPiece.PieceType.ROOK, ChessPiece.PieceType.BISHOP, ChessPiece.PieceType.KNIGHT}) {
+                        chessMoves.add(new ChessMove(pos, new ChessPosition(newRow, pos.getColumn()), promoPiece));
+                    }
+                } else {
+                    chessMoves.add(new ChessMove(pos, new ChessPosition(newRow, pos.getColumn()), null));
+                }
             }
         }
 
@@ -116,7 +132,15 @@ public class Rule {
             if (board.isValidPosition(new ChessPosition(captureRow, captureColumn))) {
                 ChessPiece targetPiece = board.getPiece(new ChessPosition(captureRow, captureColumn));
                 if (targetPiece != null && targetPiece.getTeamColor() != pieceAtCurPosition.getTeamColor()) {
-                    chessMoves.add(new ChessMove(pos, new ChessPosition(captureRow, captureColumn), null));
+                    // Check for promotion
+                    if (newRow == 8 || newRow == 1) {
+                        // Add promotion moves for each piece type
+                        for (ChessPiece.PieceType promoPiece : new ChessPiece.PieceType[]{ChessPiece.PieceType.QUEEN, ChessPiece.PieceType.ROOK, ChessPiece.PieceType.BISHOP, ChessPiece.PieceType.KNIGHT}) {
+                            chessMoves.add(new ChessMove(pos, new ChessPosition(captureRow, captureColumn), promoPiece));
+                        }
+                    } else {
+                        chessMoves.add(new ChessMove(pos, new ChessPosition(captureRow, captureColumn), null));
+                    }
                 }
             }
         }
