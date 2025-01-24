@@ -30,6 +30,10 @@ public class Rule {
         int currentY = pos.getColumn();
         ChessPiece pieceAtCurPosition = board.getPiece(new ChessPosition(pos.getRow(), pos.getColumn()));
 
+        if (pieceAtCurPosition.getPieceType() == ChessPiece.PieceType.PAWN) {
+            return getDefaultPawnMoves(board, pos);
+        }
+
         for (int[] direction : directions) {
             int dx = direction[0];
             int dy = direction[1];
@@ -73,5 +77,39 @@ public class Rule {
             chessMoves.add(new ChessMove(pos, endPosition, null));  // Assuming no promotion
         }
         return chessMoves;  // Return the ArrayList of int[] pairs
+    }
+
+    // Method for generating rook moves
+    private Collection<ChessMove> getDefaultPawnMoves(ChessBoard board, ChessPosition pos) {
+        Collection<ChessMove> chessMoves = new ArrayList<>();
+        ChessPiece pieceAtCurPosition = board.getPiece(new ChessPosition(pos.getRow(), pos.getColumn()));
+        int direction = (pieceAtCurPosition.getTeamColor() == ChessGame.TeamColor.WHITE) ? 1 : -1; // Assume white pawns are on the lower half
+        int newRow = pos.getRow() + direction;
+        // Regular move
+        if (board.isValidPosition(new ChessPosition(newRow, pos.getColumn())) &&
+                board.getPiece(new ChessPosition(newRow, pos.getColumn())) == null) {
+            chessMoves.add(new ChessMove(pos, new ChessPosition(newRow, pos.getColumn()), null));
+        }
+        // First move double forward
+        if ((pos.getRow() == 2 && direction == 1) || (pos.getRow() == 7 && direction == -1)) {
+            newRow += direction; // Move two steps forward
+            if (board.isValidPosition(new ChessPosition(newRow, pos.getColumn())) &&
+                    board.getPiece(new ChessPosition(newRow-direction, pos.getColumn())) == null &&
+                    board.getPiece(new ChessPosition(newRow, pos.getColumn())) == null) {
+                chessMoves.add(new ChessMove(pos, new ChessPosition(newRow, pos.getColumn()), null));
+            }
+        }
+        // Capture moves (diagonal)
+        for (int columnOffset : new int[]{-1, 1}) {
+            int captureRow = pos.getRow() + direction;
+            int captureColumn = pos.getColumn() + columnOffset;
+            if (board.isValidPosition(new ChessPosition(captureRow, captureColumn))) {
+                ChessPiece targetPiece = board.getPiece(new ChessPosition(captureRow, captureColumn));
+                if (targetPiece != null && targetPiece.getTeamColor() != pieceAtCurPosition.getTeamColor()) {
+                    chessMoves.add(new ChessMove(pos, new ChessPosition(captureRow, captureColumn), null));
+                }
+            }
+        }
+        return chessMoves;
     }
 }
