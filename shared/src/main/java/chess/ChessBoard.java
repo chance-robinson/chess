@@ -34,6 +34,18 @@ public class ChessBoard {
     }
 
     /**
+     * Checks if a given position is valid on the board (within bounds)
+     *
+     * @param position The position to check
+     * @return true if the position is within the bounds of the chessboard
+     */
+    public boolean isValidPosition(ChessPosition position) {
+        int row = position.getRow();
+        int column = position.getColumn();
+        return row >= 1 && row <= 8 && column >= 1 && column <= 8;
+    }
+
+    /**
      * Sets the board to the default starting board
      * (How the game of chess normally starts)
      */
