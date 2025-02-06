@@ -1,6 +1,5 @@
 package chess;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 
@@ -11,12 +10,38 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessPiece {
-    private final ChessGame.TeamColor pieceColor;
-    private final ChessPiece.PieceType type;
 
-    public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
+    private final ChessGame.TeamColor pieceColor;
+    private final PieceType type;
+
+    public ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessPiece that = (ChessPiece) o;
+        return pieceColor == that.pieceColor && type == that.type;
+    }
+
+    @Override
+    public String toString() {
+        return "ChessPiece{" +
+                "pieceColor=" + pieceColor +
+                ", type=" + type +
+                '}';
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pieceColor, type);
     }
 
     /**
@@ -45,18 +70,6 @@ public class ChessPiece {
         return type;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ChessPiece that = (ChessPiece) o;
-        return pieceColor == that.pieceColor && type == that.type;
-    }
-    @Override
-    public int hashCode() {
-        return Objects.hash(pieceColor, type);
-    }
-
     /**
      * Calculates all the positions a chess piece can move to
      * Does not take into account moves that are illegal due to leaving the king in
@@ -65,28 +78,27 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        Rule rule = switch (getPieceType()) {
-            case BISHOP -> new Rule(true, new int[][]{{1, -1}, {-1, 1}, {-1, -1}, {1, 1}});
-            case ROOK   -> new Rule(true, new int[][]{{1, 0}, {-1, 0}, {0, 1}, {0, -1}});
-            case KNIGHT -> new Rule(false, new int[][]{
-                    {2, 1}, {2, -1}, // Two squares up, one square left/right
-                    {-2, 1}, {-2, -1}, // Two squares down, one square left/right
-                    {1, 2}, {1, -2}, // One square up, two squares left/right
-                    {-1, 2}, {-1, -2} // One square down, two squares left/right
+        Rule rule = switch(getPieceType()) {
+            case KING -> new Rule(false, new int[][]{
+                    {1,0},{-1,0},{0,1},{0,-1},{1,1},{1,-1},{-1,1},{-1,-1}
             });
             case QUEEN -> new Rule(true, new int[][]{
-                    {1, 0}, {-1, 0},  // Vertical Moves
-                    {0, 1}, {0, -1},  // Horizontal Moves
-                    {1, -1}, {-1, 1}, {-1, -1}, {1, 1}, // Diagonal moves
+                    {1,0},{-1,0},{0,1},{0,-1},{1,1},{1,-1},{-1,1},{-1,-1}
             });
-            case KING   -> new Rule(false, new int[][]{
-                    {1, -1}, {-1, 1}, {-1, -1}, {1, 1},  // Diagonal moves
-                    {1, 0}, {-1, 0}, {0, 1}, {0, -1}     // Cardinal directions: Up, Down, Right, Left
+            case BISHOP -> new Rule(true, new int[][]{
+                    {1,1},{1,-1},{-1,1},{-1,-1}
             });
-            case PAWN   -> new Rule(false, new int[][]{{1,1}});
-            default -> null; // Default Case: PAWN
+            case KNIGHT -> new Rule(false, new int[][]{
+                    {2,1},{2,-1},{-2,1},{-2,-1},
+                    {1,2},{-1,2},{1,-2},{-1,-2}
+            });
+            case ROOK -> new Rule(true, new int[][]{
+                    {1,0},{-1,0},{0,1},{0,-1},
+            });
+            case PAWN -> new Rule(false, new int[][]{
+                    {0,0}
+            });
         };
-        // Get the list of possible moves as an ArrayList<int[]>
         return rule.getMoves(board, myPosition);
     }
 }
