@@ -130,7 +130,7 @@ public class ChessGame {
             int promotionRow = (currentTeam == TeamColor.WHITE) ? 8 : 1;
             if (endPos.getRow() == promotionRow) {
                 if (move.getPromotionPiece() == null) {
-                    throw new InvalidMoveException("Pawn must be promoted.");
+                    throw new InvalidMoveException("Pawn requires promotion");
                 }
                 ChessPiece promotedPiece = new ChessPiece(currentTeam, move.getPromotionPiece());
                 board.addPiece(endPos, promotedPiece);
@@ -140,7 +140,7 @@ public class ChessGame {
         if (isInCheck(currentTeam)) {
             board.addPiece(startPos, movingPiece);
             board.addPiece(endPos, null);
-            throw new InvalidMoveException("Move puts your king in check.");
+            throw new InvalidMoveException("Move puts your king in check");
         }
 
         currentTeam = (currentTeam == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
