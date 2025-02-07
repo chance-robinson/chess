@@ -74,6 +74,7 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
+        // For checking validMoves using a simulated board
         ChessPiece piece = board.getPiece(startPosition);
         if (piece == null) {
             return null;
