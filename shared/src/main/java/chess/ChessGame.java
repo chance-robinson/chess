@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.Collection;
+import java.util.ArrayList;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -10,6 +11,7 @@ import java.util.Collection;
  */
 public class ChessGame {
     private ChessBoard board;
+    private ChessBoard simulatedBoard;
     private TeamColor currentTeam = TeamColor.WHITE;
     public ChessGame() {
 
@@ -49,13 +51,33 @@ public class ChessGame {
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = board.getPiece(startPosition);
         if (piece == null) {
-            return null;
+            return null;  // If no piece exists at the start position, return null
         }
-        Collection<ChessMove> curMoves = new ChessPiece(currentTeam, piece.getPieceType()).pieceMoves(board, startPosition);
-        // FILTER MOVES
-        return curMoves;
-    }
 
+        // Create a deep copy of the board and set it as the simulated board
+
+        // Generate all possible moves for the piece
+        Collection<ChessMove> curMoves = piece.pieceMoves(board, startPosition);
+
+        // Filter out moves that would put the player's king in check
+        Collection<ChessMove> validMoves = new ArrayList<>();
+        for (ChessMove move : curMoves) {
+            simulatedBoard = board.copyBoard();
+            // Simulate the move on the board
+            ChessPosition endPosition = move.getEndPosition();
+            ChessPiece movingPiece = simulatedBoard.getPiece(startPosition);
+            simulatedBoard.addPiece(endPosition, movingPiece);  // Move the piece
+            simulatedBoard.addPiece(startPosition, null);       // Remove the piece from the start position
+
+            // Check if the move causes check
+            if (!isInCheck(piece.getTeamColor())) {
+                validMoves.add(move);
+            }
+        }
+
+
+        return validMoves;  // Return the list of valid moves
+    }
 
     /**
      * Makes a move in a chess game
@@ -74,8 +96,41 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        // Find the position of the king of the given team on the simulated board
+        ChessPosition kingPosition = findKingPosition(simulatedBoard, teamColor);
+
+        // Go through all pieces on the simulated board and check if any opponent can attack the king
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                ChessPosition pos = new ChessPosition(row + 1, col + 1);
+                ChessPiece piece = simulatedBoard.getPiece(pos);
+                if (piece != null && piece.getTeamColor() != teamColor) {
+                    // Check if the opponent's piece can move to the king's position
+                    Collection<ChessMove> opponentMoves = piece.pieceMoves(simulatedBoard, pos);
+                    if (opponentMoves.contains(new ChessMove(pos, kingPosition, null))) {
+                        return true;  // The king is in check if any opposing piece can move to the king's position
+                    }
+                }
+            }
+        }
+        return false;  // If no opponent can attack the king, the king is not in check
     }
+
+
+    public ChessPosition findKingPosition(ChessBoard board, TeamColor teamColor) {
+        // Loop through the entire board to find the king's position
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                ChessPosition pos = new ChessPosition(row + 1, col + 1);  // Board positions are 1-indexed
+                ChessPiece piece = board.getPiece(pos);
+                if (piece != null && piece.getTeamColor() == teamColor && piece.getPieceType() == ChessPiece.PieceType.KING) {
+                    return pos;  // Return the position of the king
+                }
+            }
+        }
+        return null;  // Return null if no king is found (shouldn't happen in a valid game)
+    }
+
 
     /**
      * Determines if the given team is in checkmate

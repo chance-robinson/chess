@@ -94,4 +94,22 @@ public class ChessBoard {
             squares[6][i] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
         }
     }
+
+    public ChessBoard copyBoard() {
+        ChessBoard newBoard = new ChessBoard();  // Create a new empty board
+
+        // Copy all pieces from the current board to the new one
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                ChessPosition pos = new ChessPosition(row + 1, col + 1);  // Convert to 1-indexed position
+                ChessPiece piece = this.getPiece(pos);
+                if (piece != null) {
+                    // Create a new ChessPiece with the same color and type and add it to the new board
+                    newBoard.addPiece(pos, new ChessPiece(piece.getTeamColor(), piece.getPieceType()));
+                }
+            }
+        }
+
+        return newBoard;  // Return the new board with the copied state
+    }
 }
