@@ -54,8 +54,6 @@ public class ChessGame {
             return null;  // If no piece exists at the start position, return null
         }
 
-        // Create a deep copy of the board and set it as the simulated board
-
         // Generate all possible moves for the piece
         Collection<ChessMove> curMoves = piece.pieceMoves(board, startPosition);
 
@@ -75,7 +73,7 @@ public class ChessGame {
             }
         }
 
-
+        simulatedBoard = null;
         return validMoves;  // Return the list of valid moves
     }
 
@@ -96,24 +94,30 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        // Find the position of the king of the given team on the simulated board
-        ChessPosition kingPosition = findKingPosition(simulatedBoard, teamColor);
+        // Find the position of the king of the given team on the appropriate board
+        ChessBoard activeBoard = (simulatedBoard != null) ? simulatedBoard : board;
+        ChessPosition kingPosition = findKingPosition(activeBoard, teamColor);
 
-        // Go through all pieces on the simulated board and check if any opponent can attack the king
+        // Go through all pieces on the board and check if any opponent can attack the king
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
                 ChessPosition pos = new ChessPosition(row + 1, col + 1);
-                ChessPiece piece = simulatedBoard.getPiece(pos);
+                ChessPiece piece = activeBoard.getPiece(pos);
+
                 if (piece != null && piece.getTeamColor() != teamColor) {
-                    // Check if the opponent's piece can move to the king's position
-                    Collection<ChessMove> opponentMoves = piece.pieceMoves(simulatedBoard, pos);
-                    if (opponentMoves.contains(new ChessMove(pos, kingPosition, null))) {
-                        return true;  // The king is in check if any opposing piece can move to the king's position
+                    // Get possible moves for this opponent piece
+                    Collection<ChessMove> opponentMoves = piece.pieceMoves(activeBoard, pos);
+
+                    // Check if any move attacks the king, including promotions
+                    for (ChessMove move : opponentMoves) {
+                        if (move.getEndPosition().equals(kingPosition)) {
+                            return true; // King is in check
+                        }
                     }
                 }
             }
         }
-        return false;  // If no opponent can attack the king, the king is not in check
+        return false;  // No attacking moves found
     }
 
 
@@ -139,8 +143,38 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        // If the king is not in check, it's not checkmate
+        if (!isInCheck(teamColor)) {
+            return false;
+        }
+
+        // Go through all pieces of the given team and check if any move can escape check
+        for (int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                ChessPosition position = new ChessPosition(row, col);
+                ChessPiece piece = board.getPiece(position);
+
+                if (piece != null && piece.getTeamColor() == teamColor) {
+                    // Get all valid moves for this piece
+                    Collection<ChessMove> moves = validMoves(position);
+
+                    // Debugging: Print moves
+                    System.out.println("Piece at " + position + " has moves: " + moves);
+
+                    // If any valid move exists that gets the king out of check, it's not checkmate
+                    if (moves != null && !moves.isEmpty()) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        // If no valid moves exist, it's checkmate
+        return true;
     }
+
+
+
 
     /**
      * Determines if the given team is in stalemate, which here is defined as having
