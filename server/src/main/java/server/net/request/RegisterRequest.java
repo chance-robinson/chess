@@ -1,4 +1,3 @@
 package server.net.request;
 
-public class RegisterRequest {
-}
+public record RegisterRequest(String username, String password, String email) {}

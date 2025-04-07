@@ -1,4 +1,3 @@
 package server.net.request;
 
-public class CreateGameRequest {
-}
+public record CreateGameRequest(String gameName) {}

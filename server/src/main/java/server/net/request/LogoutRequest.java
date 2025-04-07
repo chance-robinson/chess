@@ -1,4 +1,3 @@
 package server.net.request;
 
-public class LogoutRequest {
-}
+public record LogoutRequest() {}
