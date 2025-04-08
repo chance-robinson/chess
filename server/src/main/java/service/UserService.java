@@ -75,9 +75,7 @@ public class UserService {
         return new LoginResult(username, generatedAuthToken);
     }
 
-    public LogoutResult logout(LogoutRequest req) throws ServerException {
-        String authToken = req.authToken();
-
+    public LogoutResult logout(LogoutRequest req, String authToken) throws ServerException {
         if (authToken == null || authDAO.getAuth(authToken) == null) {
             throw new ServerException("Error: unauthorized", 401);
         }

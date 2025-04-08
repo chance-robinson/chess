@@ -41,25 +41,25 @@ public class Server {
         ClearHandler clearHandler = new ClearHandler(userService, gameService);
         delete("/db", clearHandler);
 
-        LogoutHandler logoutHandler = new LogoutHandler();
+        LogoutHandler logoutHandler = new LogoutHandler(userService);
         delete("/session", logoutHandler);
 
         // Posts
         RegisterHandler registerHandler = new RegisterHandler(userService);
         post("/user", registerHandler);
 
-        LoginHandler loginHandler = new LoginHandler();
+        LoginHandler loginHandler = new LoginHandler(userService);
         post("/session", loginHandler);
 
-        CreateGameHandler createGameHandler = new CreateGameHandler();
+        CreateGameHandler createGameHandler = new CreateGameHandler(gameService);
         post("/game", createGameHandler);
 
         // Puts
-        JoinGameHandler joinGameHandler = new JoinGameHandler();
+        JoinGameHandler joinGameHandler = new JoinGameHandler(gameService);
         put("/game", joinGameHandler);
 
         // Gets
-        ListGamesHandler listGameHandler = new ListGamesHandler();
+        ListGamesHandler listGameHandler = new ListGamesHandler(gameService);
         get("/game", listGameHandler);
     }
 

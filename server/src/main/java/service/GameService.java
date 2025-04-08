@@ -34,9 +34,7 @@ public class GameService {
         authDAO.clear();
     }
 
-    public ListGamesResult listGames(ListGamesRequest req) throws ServerException {
-        String authToken = req.authToken();
-
+    public ListGamesResult listGames(ListGamesRequest req, String authToken) throws ServerException {
         AuthData authData = authDAO.getAuth(authToken);
         if (authData == null) {
             throw new ServerException("Error: unauthorized", 401);
@@ -45,9 +43,11 @@ public class GameService {
         return new ListGamesResult(gameDAO.getAllGames());
     }
 
-    public CreateGameResult createGame(CreateGameRequest req) throws ServerException {
+    public CreateGameResult createGame(CreateGameRequest req, String authToken) throws ServerException {
         String gameName = req.gameName();
-        String authToken = req.authToken();
+        if (authToken == null) {
+            throw new ServerException("Error: bad request", 400);
+        }
 
         AuthData authData = authDAO.getAuth(authToken);
         if (authData == null) {
@@ -70,14 +70,17 @@ public class GameService {
         return new CreateGameResult(gameData.gameID());
     }
 
-    public JoinGameResult joinGame(JoinGameRequest req) throws ServerException {
+    public JoinGameResult joinGame(JoinGameRequest req, String authToken) throws ServerException {
         String playerColor = req.playerColor();
         int gameId = req.gameID();
-        String authToken = req.authToken();
 
         AuthData authData = authDAO.getAuth(authToken);
         if (authData == null) {
             throw new ServerException("Error: unauthorized", 401);
+        }
+
+        if (gameId == 0 || playerColor == null) {
+            throw new ServerException("Error: bad request", 400);
         }
 
         GameData gameData = gameDAO.getGame(gameId);

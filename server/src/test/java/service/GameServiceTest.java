@@ -69,8 +69,8 @@ public class GameServiceTest {
     public void createGame() {
         authDAO.createAuth(testAuth.authToken(), testAuth);
 
-        CreateGameRequest request = new CreateGameRequest("testGame", testAuth.authToken());
-        CreateGameResult result = gameService.createGame(request);
+        CreateGameRequest request = new CreateGameRequest("testGame");
+        CreateGameResult result = gameService.createGame(request, testAuth.authToken());
 
         assertNotNull(result.gameID());
     }
@@ -81,14 +81,14 @@ public class GameServiceTest {
 
         authDAO.createAuth(testAuth.authToken(), testAuth);
 
-        CreateGameRequest createGameRequest_1 = new CreateGameRequest(gameName, testAuth.authToken());
-        CreateGameResult createGameResult_1 = gameService.createGame(createGameRequest_1);
+        CreateGameRequest createGameRequest_1 = new CreateGameRequest(gameName);
+        CreateGameResult createGameResult_1 = gameService.createGame(createGameRequest_1, testAuth.authToken());
         assertNotNull(createGameResult_1.gameID());
 
-        CreateGameRequest createGameRequest_2 = new CreateGameRequest(gameName, testAuth.authToken());
+        CreateGameRequest createGameRequest_2 = new CreateGameRequest(gameName);
 
         ServerException exception = assertThrows(ServerException.class, () -> {
-            gameService.createGame(createGameRequest_2);
+            gameService.createGame(createGameRequest_2, testAuth.authToken());
         });
 
         assertEquals("Error: bad request", exception.getMessage());
@@ -99,9 +99,9 @@ public class GameServiceTest {
     public void createGame_badAuthToken() {
         String gameName = "testGame";
 
-        CreateGameRequest createGameRequest_1 = new CreateGameRequest(gameName, "badAuthToken");
+        CreateGameRequest createGameRequest_1 = new CreateGameRequest(gameName);
         ServerException exception = assertThrows(ServerException.class, () -> {
-            gameService.createGame(createGameRequest_1);
+            gameService.createGame(createGameRequest_1, "badAuthToken");
         });
 
         assertEquals("Error: unauthorized", exception.getMessage());
@@ -112,25 +112,25 @@ public class GameServiceTest {
     public void listGames() {
         authDAO.createAuth(testAuth.authToken(), testAuth);
 
-        CreateGameRequest createGameRequest_1 = new CreateGameRequest("testGame1", testAuth.authToken());
-        CreateGameResult createGameResult_1 = gameService.createGame(createGameRequest_1);
+        CreateGameRequest createGameRequest_1 = new CreateGameRequest("testGame1");
+        CreateGameResult createGameResult_1 = gameService.createGame(createGameRequest_1, testAuth.authToken());
         assertNotNull(createGameResult_1.gameID());
 
-        CreateGameRequest createGameRequest_2 = new CreateGameRequest("testGame2", testAuth.authToken());
-        CreateGameResult createGameResult_2 = gameService.createGame(createGameRequest_2);
+        CreateGameRequest createGameRequest_2 = new CreateGameRequest("testGame2");
+        CreateGameResult createGameResult_2 = gameService.createGame(createGameRequest_2, testAuth.authToken());
         assertNotNull(createGameResult_2.gameID());
 
-        ListGamesRequest listGamesRequest = new ListGamesRequest(testAuth.authToken());
-        ListGamesResult listGamesResult = gameService.listGames(listGamesRequest);
+        ListGamesRequest listGamesRequest = new ListGamesRequest();
+        ListGamesResult listGamesResult = gameService.listGames(listGamesRequest, testAuth.authToken());
 
         assertEquals(2, listGamesResult.games().size());
     }
 
     @Test
     public void listGames_badAuth() {
-        ListGamesRequest listGamesRequest = new ListGamesRequest("badAuthToken");
+        ListGamesRequest listGamesRequest = new ListGamesRequest();
         ServerException exception = assertThrows(ServerException.class, () -> {
-            gameService.listGames(listGamesRequest);
+            gameService.listGames(listGamesRequest, "badAuthToken");
         });
 
         assertEquals("Error: unauthorized", exception.getMessage());
@@ -141,18 +141,18 @@ public class GameServiceTest {
     public void joinGame() {
         authDAO.createAuth(testAuth.authToken(), testAuth);
 
-        CreateGameRequest createGameRequest = new CreateGameRequest("testGame", testAuth.authToken());
-        CreateGameResult createGameResult = gameService.createGame(createGameRequest);
+        CreateGameRequest createGameRequest = new CreateGameRequest("testGame");
+        CreateGameResult createGameResult = gameService.createGame(createGameRequest, testAuth.authToken());
         assertNotNull(createGameResult.gameID());
 
-        ListGamesRequest listGamesRequest = new ListGamesRequest(testAuth.authToken());
-        gameService.listGames(listGamesRequest);
+        ListGamesRequest listGamesRequest = new ListGamesRequest();
+        gameService.listGames(listGamesRequest, testAuth.authToken());
 
         GameData game = gameDAO.getGame(createGameResult.gameID());
         assertNull(game.whiteUsername());
 
-        JoinGameRequest joinGameRequest = new JoinGameRequest("WHITE", createGameResult.gameID(), testAuth.authToken());
-        JoinGameResult joinGameResult = gameService.joinGame(joinGameRequest);
+        JoinGameRequest joinGameRequest = new JoinGameRequest("WHITE", createGameResult.gameID());
+        JoinGameResult joinGameResult = gameService.joinGame(joinGameRequest, testAuth.authToken());
 
         game = gameDAO.getGame(createGameResult.gameID());
         assertEquals(game.whiteUsername(), testAuth.username());
@@ -164,13 +164,13 @@ public class GameServiceTest {
     public void joinGame_badAuthToken() {
         authDAO.createAuth(testAuth.authToken(), testAuth);
 
-        CreateGameRequest createGameRequest = new CreateGameRequest("testGame", testAuth.authToken());
-        CreateGameResult createGameResult = gameService.createGame(createGameRequest);
+        CreateGameRequest createGameRequest = new CreateGameRequest("testGame");
+        CreateGameResult createGameResult = gameService.createGame(createGameRequest, testAuth.authToken());
         assertNotNull(createGameResult.gameID());
 
-        JoinGameRequest joinGameRequest = new JoinGameRequest("WHITE", createGameResult.gameID(), "badAuthToken");
+        JoinGameRequest joinGameRequest = new JoinGameRequest("WHITE", createGameResult.gameID());
         ServerException exception = assertThrows(ServerException.class, () -> {
-            gameService.joinGame(joinGameRequest);
+            gameService.joinGame(joinGameRequest, "badAuthToken");
         });
 
         assertEquals("Error: unauthorized", exception.getMessage());
@@ -182,25 +182,25 @@ public class GameServiceTest {
         authDAO.createAuth(testAuth.authToken(), testAuth);
         authDAO.createAuth(testAuth2.authToken(), testAuth2);
 
-        CreateGameRequest createGameRequest = new CreateGameRequest("testGame", testAuth.authToken());
-        CreateGameResult createGameResult = gameService.createGame(createGameRequest);
+        CreateGameRequest createGameRequest = new CreateGameRequest("testGame");
+        CreateGameResult createGameResult = gameService.createGame(createGameRequest, testAuth.authToken());
         assertNotNull(createGameResult.gameID());
 
-        ListGamesRequest listGamesRequest = new ListGamesRequest(testAuth.authToken());
-        gameService.listGames(listGamesRequest);
+        ListGamesRequest listGamesRequest = new ListGamesRequest();
+        gameService.listGames(listGamesRequest, testAuth.authToken());
 
         GameData game = gameDAO.getGame(createGameResult.gameID());
         assertNull(game.whiteUsername());
 
-        JoinGameRequest joinGameRequest = new JoinGameRequest("WHITE", createGameResult.gameID(), testAuth.authToken());
-        gameService.joinGame(joinGameRequest);
+        JoinGameRequest joinGameRequest = new JoinGameRequest("WHITE", createGameResult.gameID());
+        gameService.joinGame(joinGameRequest, testAuth.authToken());
 
         game = gameDAO.getGame(createGameResult.gameID());
         assertEquals(game.whiteUsername(), testAuth.username());
 
-        JoinGameRequest joinGameRequest2 = new JoinGameRequest("WHITE", createGameResult.gameID(), testAuth2.authToken());
+        JoinGameRequest joinGameRequest2 = new JoinGameRequest("WHITE", createGameResult.gameID());
         ServerException exception = assertThrows(ServerException.class, () -> {
-            gameService.joinGame(joinGameRequest2);
+            gameService.joinGame(joinGameRequest2, testAuth2.authToken());
         });
 
         assertEquals("Error: already taken", exception.getMessage());
@@ -211,9 +211,9 @@ public class GameServiceTest {
     public void joinGame_badGameID() {
         authDAO.createAuth(testAuth.authToken(), testAuth);
 
-        JoinGameRequest joinGameRequest = new JoinGameRequest("WHITE", 999, testAuth.authToken());
+        JoinGameRequest joinGameRequest = new JoinGameRequest("WHITE", 999);
         ServerException exception = assertThrows(ServerException.class, () -> {
-            gameService.joinGame(joinGameRequest);
+            gameService.joinGame(joinGameRequest, testAuth.authToken());
         });
 
         assertEquals("Error: bad request", exception.getMessage());

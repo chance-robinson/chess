@@ -9,12 +9,12 @@ import java.util.HashMap;
 
 public class MemoryGameDAO implements GameDAO {
     private final HashMap<Integer, GameData> games = new HashMap<>();
-    private int newGameID = 0;
+    private int newGameID = 1;
 
     @Override
     public void clear() {
         games.clear();
-        newGameID = 0;
+        newGameID = 1;
     }
 
     @Override
