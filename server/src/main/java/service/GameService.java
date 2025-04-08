@@ -9,11 +9,13 @@ import server.ServerException;
 import server.net.request.CreateGameRequest;
 import server.net.request.JoinGameRequest;
 import server.net.result.CreateGameResult;
-import server.net.result.EmptyResult;
 import server.net.result.ListGamesResult;
 
 import java.util.Objects;
 
+/**
+ * The service pertaining to all methods related to the GameDAO
+ */
 public class GameService {
     final GameDAO gameDAO;
     final AuthDAO authDAO;
@@ -23,6 +25,13 @@ public class GameService {
         this.authDAO = authDAO;
     }
 
+    /**
+     * Returns all games from the authDAO
+     *
+     * @param authToken an authToken that will get authenticated
+     * @return ListGamesResult array of games
+     * @throws ServerException Codes: 401
+     */
     public ListGamesResult listGames(String authToken) throws ServerException {
         AuthData authData = authDAO.getAuth(authToken);
         if (authData == null) {
@@ -32,6 +41,14 @@ public class GameService {
         return new ListGamesResult(gameDAO.getAllGames());
     }
 
+    /**
+     * Creates a game on the gameDAO
+     *
+     * @param req of type CreateGameRequest
+     * @param authToken an authToken that will get authenticated
+     * @return CreateGameResult gameID
+     * @throws ServerException Codes: 400, 401
+     */
     public CreateGameResult createGame(CreateGameRequest req, String authToken) throws ServerException {
         String gameName = req.gameName();
         if (authToken == null) {
@@ -59,7 +76,15 @@ public class GameService {
         return new CreateGameResult(gameData.gameID());
     }
 
-    public EmptyResult joinGame(JoinGameRequest req, String authToken) throws ServerException {
+    /**
+     * Allows a user to join a game by updating the specified playerColor on
+     * the game data on the gameDAO
+     *
+     * @param req of type JoinGameRequest
+     * @param authToken an authToken that will get authenticated
+     * @throws ServerException Codes: 400, 401
+     */
+    public void joinGame(JoinGameRequest req, String authToken) throws ServerException {
         String playerColor = req.playerColor();
         int gameId = req.gameID();
 
@@ -95,7 +120,5 @@ public class GameService {
         }
 
         gameDAO.update(gameData);
-
-        return new EmptyResult();
     }
 }

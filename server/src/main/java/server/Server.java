@@ -16,6 +16,12 @@ import static spark.Spark.*;
 
 public class Server {
 
+    /**
+     * Runs the Spark server on a given port
+     *
+     * @param desiredPort the port to run on
+     * @return int the spark port
+     */
     public int run(int desiredPort) {
         Spark.port(desiredPort);
 
@@ -31,6 +37,9 @@ public class Server {
         return Spark.port();
     }
 
+    /**
+     * Creates the routes on Spark using the dedicated handlers for a specified path
+     */
     private static void createRoutes() {
         UserDAO userDAO = new MemoryUserDAO();
         AuthDAO authDAO = new MemoryAuthDAO();
@@ -65,6 +74,9 @@ public class Server {
         get("/game", listGameHandler);
     }
 
+    /**
+     * Stops the Spark server
+     */
     public void stop() {
         Spark.stop();
         Spark.awaitStop();

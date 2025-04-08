@@ -7,13 +7,15 @@ import model.UserData;
 import server.ServerException;
 import server.net.request.LoginRequest;
 import server.net.request.RegisterRequest;
-import server.net.result.EmptyResult;
 import server.net.result.LoginResult;
 import server.net.result.RegisterResult;
 
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * The service pertaining to all methods related to the UserDAO
+ */
 public class UserService {
     final UserDAO userDAO;
     final AuthDAO authDAO;
@@ -24,6 +26,13 @@ public class UserService {
         this.authDAO = authDAO;
     }
 
+    /**
+     * Registers a user to the DAO based on username, password, email
+     *
+     * @param req of type RegisterResult
+     * @return RegisterResult the username and authToken
+     * @throws ServerException Codes: 400, 403
+     */
     public RegisterResult register(RegisterRequest req) throws ServerException {
         String email = req.email();
         String username = req.username();
@@ -45,6 +54,13 @@ public class UserService {
         return new RegisterResult(username, generatedAuthToken);
     }
 
+    /**
+     * Logs in a user given a username and password
+     *
+     * @param req of type LoginRequest
+     * @return LoginResult the username and authToken
+     * @throws ServerException Codes: 400, 401
+     */
     public LoginResult login(LoginRequest req) throws ServerException {
         String username = req.username();
         String password = req.password();
@@ -65,16 +81,25 @@ public class UserService {
         return new LoginResult(username, generatedAuthToken);
     }
 
-    public EmptyResult logout(String authToken) throws ServerException {
+    /**
+     * Logs out a user based on authToken
+     *
+     * @param authToken an authToken that will get authenticated
+     * @throws ServerException Codes: 401
+     */
+    public void logout(String authToken) throws ServerException {
         if (authToken == null || authDAO.getAuth(authToken) == null) {
             throw new ServerException("Error: unauthorized", 401);
         }
 
         authDAO.deleteAuth(authToken);
-
-        return new EmptyResult();
     }
 
+    /**
+     * Returns a randomly generated authToken
+     *
+     * @return String of type UUID
+     */
     public String generateAuthToken() {
         return UUID.randomUUID().toString();
     }

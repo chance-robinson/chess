@@ -3,12 +3,14 @@ package handler;
 import com.google.gson.Gson;
 import server.ServerException;
 import server.net.request.JoinGameRequest;
-import server.net.result.EmptyResult;
 import service.GameService;
 import spark.Request;
 import spark.Response;
 import spark.Route;
 
+/**
+ * Spark handler for the JoinGame request/result on the gameService.joinGame method
+ */
 public class JoinGameHandler implements Route {
     private final GameService gameService;
 
@@ -16,15 +18,23 @@ public class JoinGameHandler implements Route {
         this.gameService = gameService;
     }
 
+    /**
+     * Handles the joining of a game for a user from the Spark server
+     *
+     * @param req JSON formatted HTTP request with joinGameRequest data and authToken in header
+     * @param res JSON formatted HTTP response object
+     * @return empty response indicating success
+     * @throws ServerException on errors
+     */
     @Override
     public Object handle(Request req, Response res) throws ServerException {
         try {
             String authToken = req.headers("Authorization");
             JoinGameRequest joinGameRequest = new Gson().fromJson(req.body(), JoinGameRequest.class);
-            EmptyResult joinGameResult = gameService.joinGame(joinGameRequest, authToken);
+            gameService.joinGame(joinGameRequest, authToken);
 
             res.status(200);
-            return new Gson().toJson(joinGameResult);
+            return "";
         } catch (ServerException e) {
             res.status(e.getStatusCode());
             return new Gson().toJson(new HandlerError(e.getMessage()));

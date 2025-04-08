@@ -9,6 +9,9 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 
+/**
+ * Spark handler for the Login request/result on the userService.login method
+ */
 public class LoginHandler implements Route {
     private final UserService userService;
 
@@ -16,6 +19,14 @@ public class LoginHandler implements Route {
         this.userService = userService;
     }
 
+    /**
+     * Handles the login for a user from the Spark server
+     *
+     * @param req JSON formatted HTTP request with LoginRequest data
+     * @param res JSON formatted HTTP response object
+     * @return JSON formatted registerResult object
+     * @throws ServerException on errors
+     */
     @Override
     public Object handle(Request req, Response res) throws ServerException {
         try {

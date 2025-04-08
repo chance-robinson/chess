@@ -1,5 +1,8 @@
 package server;
 
+/**
+ * Basic Exception specifically for Server messages and status codes
+ */
 public class ServerException extends RuntimeException {
     private final int statusCode;
 
@@ -13,6 +16,11 @@ public class ServerException extends RuntimeException {
         this.statusCode = statusCode;
     }
 
+    /**
+     * Returns the statusCode for a given ServerException
+     *
+     * @return an int statusCode
+     */
     public int getStatusCode() {
         return statusCode;
     }

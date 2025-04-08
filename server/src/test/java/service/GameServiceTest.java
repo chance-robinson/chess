@@ -12,7 +12,6 @@ import server.ServerException;
 import server.net.request.CreateGameRequest;
 import server.net.request.JoinGameRequest;
 import server.net.result.CreateGameResult;
-import server.net.result.EmptyResult;
 import server.net.result.ListGamesResult;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -111,12 +110,10 @@ public class GameServiceTest {
         assertNull(game.whiteUsername());
 
         JoinGameRequest joinGameRequest = new JoinGameRequest("WHITE", createGameResult.gameID());
-        EmptyResult joinGameResult = gameService.joinGame(joinGameRequest, testAuth.authToken());
+        gameService.joinGame(joinGameRequest, testAuth.authToken());
 
         game = gameDAO.getGame(createGameResult.gameID());
         assertEquals(game.whiteUsername(), testAuth.username());
-
-        assertEquals(new EmptyResult(), joinGameResult);
     }
 
     @Test

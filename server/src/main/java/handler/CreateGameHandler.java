@@ -9,6 +9,9 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 
+/**
+ * Spark handler for the CreateGame request/result on the gameService.createGame method
+ */
 public class CreateGameHandler implements Route {
     private final GameService gameService;
 
@@ -16,6 +19,14 @@ public class CreateGameHandler implements Route {
         this.gameService = gameService;
     }
 
+    /**
+     * Handles the creation of a game for a user from the Spark server
+     *
+     * @param req JSON formatted HTTP request with CreateGameRequest data and authToken in header
+     * @param res JSON formatted HTTP response object
+     * @return JSON formatted ListGamesResult object
+     * @throws ServerException on errors
+     */
     @Override
     public Object handle(Request req, Response res) throws ServerException {
         try {

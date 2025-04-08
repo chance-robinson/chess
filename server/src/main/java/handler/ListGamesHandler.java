@@ -8,6 +8,9 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 
+/**
+ * Spark handler for the ListGames request/result on the gameService.listGames method
+ */
 public class ListGamesHandler implements Route {
     private final GameService gameService;
 
@@ -15,6 +18,14 @@ public class ListGamesHandler implements Route {
         this.gameService = gameService;
     }
 
+    /**
+     * Handles the return of listing games for a user from the Spark server
+     *
+     * @param req JSON formatted HTTP request with authToken in header
+     * @param res JSON formatted HTTP response object
+     * @return JSON formatted ListGamesResult object
+     * @throws ServerException on errors
+     */
     @Override
     public Object handle(Request req, Response res) throws ServerException {
         try {

@@ -4,13 +4,13 @@ import dataaccess.dao.AuthDAO;
 import dataaccess.dao.UserDAO;
 import dataaccess.dao.memory.MemoryAuthDAO;
 import dataaccess.dao.memory.MemoryUserDAO;
+import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.ServerException;
 import server.net.request.LoginRequest;
 import server.net.request.RegisterRequest;
-import server.net.result.EmptyResult;
 import server.net.result.LoginResult;
 import server.net.result.RegisterResult;
 
@@ -18,13 +18,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class UserServiceTest {
     private UserDAO userDAO;
+    private AuthDAO authDAO;
     private UserService userService;
     private UserData testUser;
 
     @BeforeEach
     public void initialize() {
         userDAO = new MemoryUserDAO();
-        AuthDAO authDAO = new MemoryAuthDAO();
+        authDAO = new MemoryAuthDAO();
         userService = new UserService(userDAO, authDAO);
         testUser = new UserData("testUser", "testPass", "test@example.com");
     }
@@ -117,13 +118,10 @@ public class UserServiceTest {
         RegisterResult regResult = userService.register(regRequest);
         assertNotNull(regResult);
 
-        LoginRequest loginRequest = new LoginRequest(testUser.username(), testUser.password());
-        LoginResult loginResult = userService.login(loginRequest);
-        assertNotNull(loginResult);
+        userService.logout(regResult.authToken());
 
-        EmptyResult result = userService.logout(loginResult.authToken());
-
-        assertEquals(new EmptyResult(), result);
+        AuthData loggedOutUserAuth = authDAO.getAuth(regResult.authToken());
+        assertNull(loggedOutUserAuth);
     }
 
     @Test
@@ -131,10 +129,6 @@ public class UserServiceTest {
         RegisterRequest regRequest = new RegisterRequest(testUser.username(), testUser.password(), testUser.email());
         RegisterResult regResult = userService.register(regRequest);
         assertNotNull(regResult);
-
-        LoginRequest loginRequest = new LoginRequest(testUser.username(), testUser.password());
-        LoginResult loginResult = userService.login(loginRequest);
-        assertNotNull(loginResult);
 
         ServerException exception = assertThrows(ServerException.class, () -> userService.logout("badAuthToken"));
 

@@ -9,6 +9,9 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 
+/**
+ * Spark handler for the Register request/result on the userService.register method
+ */
 public class RegisterHandler implements Route {
     private final UserService userService;
 
@@ -16,6 +19,14 @@ public class RegisterHandler implements Route {
         this.userService = userService;
     }
 
+    /**
+     * Handles the user registration from the Spark server
+     *
+     * @param req JSON formatted HTTP request with RegisterRequest data
+     * @param res JSON formatted HTTP response object
+     * @return JSON formatted registerResult object
+     * @throws ServerException on errors
+     */
     @Override
     public Object handle(Request req, Response res) throws ServerException {
         try {

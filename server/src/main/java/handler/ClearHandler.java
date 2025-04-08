@@ -6,6 +6,9 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 
+/**
+ * Spark handler for the Clear request/result on the generalService.clear method
+ */
 public class ClearHandler implements Route {
     private final GeneralService generalService;
 
@@ -13,6 +16,14 @@ public class ClearHandler implements Route {
         this.generalService = generalService;
     }
 
+    /**
+     * Handles the clearing of all DAO data from the spark Server
+     *
+     * @param req JSON formatted HTTP request object
+     * @param res JSON formatted HTTP response object
+     * @return empty response indicating success
+     * @throws ServerException on errors
+     */
     @Override
     public Object handle(Request req, Response res) throws ServerException {
         try {
