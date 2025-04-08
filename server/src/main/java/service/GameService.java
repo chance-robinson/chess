@@ -9,13 +9,11 @@ import model.GameData;
 import server.ServerException;
 import server.net.request.CreateGameRequest;
 import server.net.request.JoinGameRequest;
-import server.net.request.ListGamesRequest;
 import server.net.result.CreateGameResult;
-import server.net.result.JoinGameResult;
+import server.net.result.EmptyResult;
 import server.net.result.ListGamesResult;
 
 import java.util.Objects;
-import java.util.UUID;
 
 public class GameService {
     final UserDAO userDAO;
@@ -34,7 +32,7 @@ public class GameService {
         authDAO.clear();
     }
 
-    public ListGamesResult listGames(ListGamesRequest req, String authToken) throws ServerException {
+    public ListGamesResult listGames(String authToken) throws ServerException {
         AuthData authData = authDAO.getAuth(authToken);
         if (authData == null) {
             throw new ServerException("Error: unauthorized", 401);
@@ -70,7 +68,7 @@ public class GameService {
         return new CreateGameResult(gameData.gameID());
     }
 
-    public JoinGameResult joinGame(JoinGameRequest req, String authToken) throws ServerException {
+    public EmptyResult joinGame(JoinGameRequest req, String authToken) throws ServerException {
         String playerColor = req.playerColor();
         int gameId = req.gameID();
 
@@ -107,6 +105,6 @@ public class GameService {
 
         gameDAO.update(gameData);
 
-        return new JoinGameResult();
+        return new EmptyResult();
     }
 }

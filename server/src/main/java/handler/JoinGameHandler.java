@@ -3,7 +3,7 @@ package handler;
 import com.google.gson.Gson;
 import server.ServerException;
 import server.net.request.JoinGameRequest;
-import server.net.result.JoinGameResult;
+import server.net.result.EmptyResult;
 import service.GameService;
 import spark.Request;
 import spark.Response;
@@ -21,7 +21,7 @@ public class JoinGameHandler implements Route {
         try {
             String authToken = req.headers("Authorization");
             JoinGameRequest joinGameRequest = new Gson().fromJson(req.body(), JoinGameRequest.class);
-            JoinGameResult joinGameResult = gameService.joinGame(joinGameRequest, authToken);
+            EmptyResult joinGameResult = gameService.joinGame(joinGameRequest, authToken);
 
             res.status(200);
             return new Gson().toJson(joinGameResult);

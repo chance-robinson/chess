@@ -2,7 +2,6 @@ package handler;
 
 import com.google.gson.Gson;
 import server.ServerException;
-import server.net.request.ListGamesRequest;
 import server.net.result.ListGamesResult;
 import service.GameService;
 import spark.Request;
@@ -20,8 +19,8 @@ public class ListGamesHandler implements Route {
     public Object handle(Request req, Response res) throws ServerException {
         try {
             String authToken = req.headers("Authorization");
-            ListGamesRequest listGamesRequest = new Gson().fromJson(req.body(), ListGamesRequest.class);
-            ListGamesResult listGamesResult = gameService.listGames(listGamesRequest, authToken);
+
+            ListGamesResult listGamesResult = gameService.listGames(authToken);
 
             res.status(200);
             return new Gson().toJson(listGamesResult);

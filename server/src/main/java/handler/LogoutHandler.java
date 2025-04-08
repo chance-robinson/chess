@@ -2,8 +2,7 @@ package handler;
 
 import com.google.gson.Gson;
 import server.ServerException;
-import server.net.request.LogoutRequest;
-import server.net.result.LogoutResult;
+import server.net.result.EmptyResult;
 import service.UserService;
 import spark.Request;
 import spark.Response;
@@ -21,8 +20,7 @@ public class LogoutHandler implements Route {
         try {
             String authToken = req.headers("Authorization");
 
-            LogoutRequest logoutRequest = new Gson().fromJson(req.body(), LogoutRequest.class);
-            LogoutResult logoutResult = userService.logout(logoutRequest, authToken);
+            EmptyResult logoutResult = userService.logout(authToken);
 
             res.status(200);
             return new Gson().toJson(logoutResult);

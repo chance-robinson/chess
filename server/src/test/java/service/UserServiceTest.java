@@ -14,10 +14,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.ServerException;
 import server.net.request.LoginRequest;
-import server.net.request.LogoutRequest;
 import server.net.request.RegisterRequest;
+import server.net.result.EmptyResult;
 import server.net.result.LoginResult;
-import server.net.result.LogoutResult;
 import server.net.result.RegisterResult;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -83,9 +82,7 @@ public class UserServiceTest {
 
         RegisterRequest request = new RegisterRequest(testUser.username(), testUser.password(), "differentemail@email.com");
 
-        ServerException exception = assertThrows(ServerException.class, () -> {
-            userService.register(request);
-        });
+        ServerException exception = assertThrows(ServerException.class, () -> userService.register(request));
 
         assertEquals("Error: already taken", exception.getMessage());
         assertEquals(403, exception.getStatusCode());
@@ -97,9 +94,7 @@ public class UserServiceTest {
 
         RegisterRequest request = new RegisterRequest("differentTestUser", testUser.password(), testUser.email());
 
-        ServerException exception = assertThrows(ServerException.class, () -> {
-            userService.register(request);
-        });
+        ServerException exception = assertThrows(ServerException.class, () -> userService.register(request));
 
         assertEquals("Error: already taken", exception.getMessage());
         assertEquals(403, exception.getStatusCode());
@@ -127,9 +122,7 @@ public class UserServiceTest {
 
         LoginRequest request = new LoginRequest("badUser", testUser.password());
 
-        ServerException exception = assertThrows(ServerException.class, () -> {
-            userService.login(request);
-        });
+        ServerException exception = assertThrows(ServerException.class, () -> userService.login(request));
 
         assertEquals("Error: unauthorized", exception.getMessage());
         assertEquals(401, exception.getStatusCode());
@@ -143,9 +136,7 @@ public class UserServiceTest {
 
         LoginRequest request = new LoginRequest(testUser.username(), "badPassword");
 
-        ServerException exception = assertThrows(ServerException.class, () -> {
-            userService.login(request);
-        });
+        ServerException exception = assertThrows(ServerException.class, () -> userService.login(request));
 
         assertEquals("Error: unauthorized", exception.getMessage());
         assertEquals(401, exception.getStatusCode());
@@ -161,10 +152,9 @@ public class UserServiceTest {
         LoginResult login_result = userService.login(login_request);
         assertNotNull(login_result);
 
-        LogoutRequest request = new LogoutRequest();
-        LogoutResult result = userService.logout(request, login_result.authToken());
+        EmptyResult result = userService.logout(login_result.authToken());
 
-        assertEquals(new LogoutResult(), result);
+        assertEquals(new EmptyResult(), result);
     }
 
     @Test
@@ -177,11 +167,7 @@ public class UserServiceTest {
         LoginResult login_result = userService.login(login_request);
         assertNotNull(login_result);
 
-        LogoutRequest request = new LogoutRequest();
-
-        ServerException exception = assertThrows(ServerException.class, () -> {
-            userService.logout(request, "badAuthToken");
-        });
+        ServerException exception = assertThrows(ServerException.class, () -> userService.logout("badAuthToken"));
 
         assertEquals("Error: unauthorized", exception.getMessage());
         assertEquals(401, exception.getStatusCode());

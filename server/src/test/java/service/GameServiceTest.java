@@ -15,9 +15,8 @@ import org.junit.jupiter.api.Test;
 import server.ServerException;
 import server.net.request.CreateGameRequest;
 import server.net.request.JoinGameRequest;
-import server.net.request.ListGamesRequest;
 import server.net.result.CreateGameResult;
-import server.net.result.JoinGameResult;
+import server.net.result.EmptyResult;
 import server.net.result.ListGamesResult;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -87,9 +86,7 @@ public class GameServiceTest {
 
         CreateGameRequest createGameRequest_2 = new CreateGameRequest(gameName);
 
-        ServerException exception = assertThrows(ServerException.class, () -> {
-            gameService.createGame(createGameRequest_2, testAuth.authToken());
-        });
+        ServerException exception = assertThrows(ServerException.class, () -> gameService.createGame(createGameRequest_2, testAuth.authToken()));
 
         assertEquals("Error: bad request", exception.getMessage());
         assertEquals(400, exception.getStatusCode());
@@ -100,9 +97,7 @@ public class GameServiceTest {
         String gameName = "testGame";
 
         CreateGameRequest createGameRequest_1 = new CreateGameRequest(gameName);
-        ServerException exception = assertThrows(ServerException.class, () -> {
-            gameService.createGame(createGameRequest_1, "badAuthToken");
-        });
+        ServerException exception = assertThrows(ServerException.class, () -> gameService.createGame(createGameRequest_1, "badAuthToken"));
 
         assertEquals("Error: unauthorized", exception.getMessage());
         assertEquals(401, exception.getStatusCode());
@@ -120,18 +115,14 @@ public class GameServiceTest {
         CreateGameResult createGameResult_2 = gameService.createGame(createGameRequest_2, testAuth.authToken());
         assertNotNull(createGameResult_2.gameID());
 
-        ListGamesRequest listGamesRequest = new ListGamesRequest();
-        ListGamesResult listGamesResult = gameService.listGames(listGamesRequest, testAuth.authToken());
+        ListGamesResult listGamesResult = gameService.listGames(testAuth.authToken());
 
         assertEquals(2, listGamesResult.games().size());
     }
 
     @Test
     public void listGames_badAuth() {
-        ListGamesRequest listGamesRequest = new ListGamesRequest();
-        ServerException exception = assertThrows(ServerException.class, () -> {
-            gameService.listGames(listGamesRequest, "badAuthToken");
-        });
+        ServerException exception = assertThrows(ServerException.class, () -> gameService.listGames("badAuthToken"));
 
         assertEquals("Error: unauthorized", exception.getMessage());
         assertEquals(401, exception.getStatusCode());
@@ -145,19 +136,18 @@ public class GameServiceTest {
         CreateGameResult createGameResult = gameService.createGame(createGameRequest, testAuth.authToken());
         assertNotNull(createGameResult.gameID());
 
-        ListGamesRequest listGamesRequest = new ListGamesRequest();
-        gameService.listGames(listGamesRequest, testAuth.authToken());
+        gameService.listGames(testAuth.authToken());
 
         GameData game = gameDAO.getGame(createGameResult.gameID());
         assertNull(game.whiteUsername());
 
         JoinGameRequest joinGameRequest = new JoinGameRequest("WHITE", createGameResult.gameID());
-        JoinGameResult joinGameResult = gameService.joinGame(joinGameRequest, testAuth.authToken());
+        EmptyResult joinGameResult = gameService.joinGame(joinGameRequest, testAuth.authToken());
 
         game = gameDAO.getGame(createGameResult.gameID());
         assertEquals(game.whiteUsername(), testAuth.username());
 
-        assertEquals(new JoinGameResult(), joinGameResult);
+        assertEquals(new EmptyResult(), joinGameResult);
     }
 
     @Test
@@ -169,9 +159,7 @@ public class GameServiceTest {
         assertNotNull(createGameResult.gameID());
 
         JoinGameRequest joinGameRequest = new JoinGameRequest("WHITE", createGameResult.gameID());
-        ServerException exception = assertThrows(ServerException.class, () -> {
-            gameService.joinGame(joinGameRequest, "badAuthToken");
-        });
+        ServerException exception = assertThrows(ServerException.class, () -> gameService.joinGame(joinGameRequest, "badAuthToken"));
 
         assertEquals("Error: unauthorized", exception.getMessage());
         assertEquals(401, exception.getStatusCode());
@@ -186,8 +174,7 @@ public class GameServiceTest {
         CreateGameResult createGameResult = gameService.createGame(createGameRequest, testAuth.authToken());
         assertNotNull(createGameResult.gameID());
 
-        ListGamesRequest listGamesRequest = new ListGamesRequest();
-        gameService.listGames(listGamesRequest, testAuth.authToken());
+        gameService.listGames(testAuth.authToken());
 
         GameData game = gameDAO.getGame(createGameResult.gameID());
         assertNull(game.whiteUsername());
@@ -199,9 +186,7 @@ public class GameServiceTest {
         assertEquals(game.whiteUsername(), testAuth.username());
 
         JoinGameRequest joinGameRequest2 = new JoinGameRequest("WHITE", createGameResult.gameID());
-        ServerException exception = assertThrows(ServerException.class, () -> {
-            gameService.joinGame(joinGameRequest2, testAuth2.authToken());
-        });
+        ServerException exception = assertThrows(ServerException.class, () -> gameService.joinGame(joinGameRequest2, testAuth2.authToken()));
 
         assertEquals("Error: already taken", exception.getMessage());
         assertEquals(403, exception.getStatusCode());
@@ -212,9 +197,7 @@ public class GameServiceTest {
         authDAO.createAuth(testAuth.authToken(), testAuth);
 
         JoinGameRequest joinGameRequest = new JoinGameRequest("WHITE", 999);
-        ServerException exception = assertThrows(ServerException.class, () -> {
-            gameService.joinGame(joinGameRequest, testAuth.authToken());
-        });
+        ServerException exception = assertThrows(ServerException.class, () -> gameService.joinGame(joinGameRequest, testAuth.authToken()));
 
         assertEquals("Error: bad request", exception.getMessage());
         assertEquals(400, exception.getStatusCode());

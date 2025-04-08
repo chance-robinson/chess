@@ -2,7 +2,6 @@ package dataAccess.dao.memory;
 
 import dataAccess.dao.GameDAO;
 import model.GameData;
-import model.UserData;
 
 import java.util.ArrayList;
 import java.util.HashMap;

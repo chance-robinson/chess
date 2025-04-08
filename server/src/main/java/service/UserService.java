@@ -7,10 +7,9 @@ import model.AuthData;
 import model.UserData;
 import server.ServerException;
 import server.net.request.LoginRequest;
-import server.net.request.LogoutRequest;
 import server.net.request.RegisterRequest;
+import server.net.result.EmptyResult;
 import server.net.result.LoginResult;
-import server.net.result.LogoutResult;
 import server.net.result.RegisterResult;
 
 import java.util.Objects;
@@ -75,14 +74,14 @@ public class UserService {
         return new LoginResult(username, generatedAuthToken);
     }
 
-    public LogoutResult logout(LogoutRequest req, String authToken) throws ServerException {
+    public EmptyResult logout(String authToken) throws ServerException {
         if (authToken == null || authDAO.getAuth(authToken) == null) {
             throw new ServerException("Error: unauthorized", 401);
         }
 
         authDAO.deleteAuth(authToken);
 
-        return new LogoutResult();
+        return new EmptyResult();
     }
 
     public String generateAuthToken() {
