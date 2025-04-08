@@ -2,6 +2,7 @@ package dataAccess.dao.memory;
 
 import dataAccess.dao.GameDAO;
 import model.GameData;
+import model.UserData;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,5 +35,15 @@ public class MemoryGameDAO implements GameDAO {
     @Override
     public ArrayList<GameData> getAllGames() {
         return new ArrayList<>(games.values());
+    }
+
+    @Override
+    public GameData getGameByGameName(String gameName) {
+        for (GameData game : games.values()) {
+            if (game.gameName().equals(gameName)) {
+                return game;
+            }
+        }
+        return null;
     }
 }

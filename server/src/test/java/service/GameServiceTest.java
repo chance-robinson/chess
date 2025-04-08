@@ -12,15 +12,20 @@ import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import server.ServerException;
+import server.net.request.CreateGameRequest;
+import server.net.request.ListGamesRequest;
+import server.net.result.CreateGameResult;
+import server.net.result.ListGamesResult;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class GameServiceTest {
     private UserDAO userDAO;
     private GameDAO gameDAO;
     private AuthDAO authDAO;
     private UserService userService;
+    private GameService gameService;
     private UserData testUser;
     private AuthData testAuth;
 
@@ -30,6 +35,7 @@ public class GameServiceTest {
         gameDAO = new MemoryGameDAO();
         authDAO = new MemoryAuthDAO();
         userService = new UserService(userDAO, gameDAO, authDAO);
+        gameService = new GameService(userDAO, gameDAO, authDAO);
         testUser = new UserData("testUser", "testPass", "test@example.com");
         testAuth = new AuthData("testAuth", "testUser");
     }
@@ -56,7 +62,74 @@ public class GameServiceTest {
     }
 
     @Test
-    public void listGames() {
+    public void createGame() {
+        authDAO.createAuth(testAuth.authToken(), testAuth);
 
+        CreateGameRequest request = new CreateGameRequest("testGame", testAuth.authToken());
+        CreateGameResult result = gameService.createGame(request);
+
+        assertNotNull(result.gameID());
+    }
+
+    @Test
+    public void createGame_duplicateGameName() {
+        String gameName = "testGame";
+
+        authDAO.createAuth(testAuth.authToken(), testAuth);
+
+        CreateGameRequest createGameRequest_1 = new CreateGameRequest(gameName, testAuth.authToken());
+        CreateGameResult createGameResult_1 = gameService.createGame(createGameRequest_1);
+        assertNotNull(createGameResult_1.gameID());
+
+        CreateGameRequest createGameRequest_2 = new CreateGameRequest(gameName, testAuth.authToken());
+
+        ServerException exception = assertThrows(ServerException.class, () -> {
+            gameService.createGame(createGameRequest_2);
+        });
+
+        assertEquals("Error: bad request", exception.getMessage());
+        assertEquals(400, exception.getStatusCode());
+    }
+
+    @Test
+    public void createGame_badAuthToken() {
+        String gameName = "testGame";
+
+        CreateGameRequest createGameRequest_1 = new CreateGameRequest(gameName, "badAuthToken");
+        ServerException exception = assertThrows(ServerException.class, () -> {
+            gameService.createGame(createGameRequest_1);
+        });
+
+        assertEquals("Error: unauthorized", exception.getMessage());
+        assertEquals(401, exception.getStatusCode());
+    }
+
+    @Test
+    public void listGames() {
+        authDAO.createAuth(testAuth.authToken(), testAuth);
+
+        CreateGameRequest createGameRequest_1 = new CreateGameRequest("testGame1", testAuth.authToken());
+        CreateGameResult createGameResult_1 = gameService.createGame(createGameRequest_1);
+        assertNotNull(createGameResult_1.gameID());
+
+        CreateGameRequest createGameRequest_2 = new CreateGameRequest("testGame2", testAuth.authToken());
+        CreateGameResult createGameResult_2 = gameService.createGame(createGameRequest_2);
+        assertNotNull(createGameResult_2.gameID());
+
+        ListGamesRequest listGamesRequest = new ListGamesRequest(testAuth.authToken());
+        ListGamesResult listGamesResult = gameService.listGames(listGamesRequest);
+
+        assertEquals(2, listGamesResult.games().size());
+    }
+
+    @Test
+    public void listGames_badAuth() {
+        ListGamesRequest listGamesRequest = new ListGamesRequest("badAuthToken");
+        ServerException exception = assertThrows(ServerException.class, () -> {
+            gameService.listGames(listGamesRequest);
+        });
+
+        assertEquals("Error: unauthorized", exception.getMessage());
+        assertEquals(401, exception.getStatusCode());
     }
 }

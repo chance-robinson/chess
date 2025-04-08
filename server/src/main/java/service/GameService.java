@@ -1,11 +1,15 @@
 package service;
 
+import chess.ChessGame;
 import dataAccess.dao.AuthDAO;
 import dataAccess.dao.GameDAO;
 import dataAccess.dao.UserDAO;
 import model.AuthData;
+import model.GameData;
 import server.ServerException;
+import server.net.request.CreateGameRequest;
 import server.net.request.ListGamesRequest;
+import server.net.result.CreateGameResult;
 import server.net.result.ListGamesResult;
 
 import java.util.UUID;
@@ -36,6 +40,31 @@ public class GameService {
         }
 
         return new ListGamesResult(gameDAO.getAllGames());
+    }
+
+    public CreateGameResult createGame(CreateGameRequest req) throws ServerException {
+        String gameName = req.gameName();
+        String authToken = req.authToken();
+
+        AuthData authData = authDAO.getAuth(authToken);
+        if (authData == null) {
+            throw new ServerException("Error: unauthorized", 401);
+        }
+        if (gameDAO.getGameByGameName(gameName) != null) {
+            throw new ServerException("Error: bad request", 400);
+        }
+
+        ChessGame chessGame = new ChessGame();
+        GameData gameData = new GameData(
+                gameDAO.generateGameID(),
+                null,
+                null,
+                gameName,
+                chessGame);
+
+        gameDAO.createGame(gameData);
+
+        return new CreateGameResult(gameData.gameID());
     }
 
     public String generateAuthToken() {

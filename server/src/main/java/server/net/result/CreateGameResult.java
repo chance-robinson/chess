@@ -1,3 +1,3 @@
 package server.net.result;
 
-public record CreateGameResult(String gameName) {}
+public record CreateGameResult(Integer gameID) {}

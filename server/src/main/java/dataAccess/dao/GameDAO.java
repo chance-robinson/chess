@@ -10,4 +10,5 @@ public interface GameDAO {
     GameData getGame(int gameID);
     int generateGameID();
     ArrayList<GameData> getAllGames();
+    GameData getGameByGameName(String gameName);
 }
