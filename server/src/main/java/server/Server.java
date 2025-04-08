@@ -8,6 +8,7 @@ import dataAccess.dao.memory.MemoryGameDAO;
 import dataAccess.dao.memory.MemoryUserDAO;
 import handler.*;
 import service.GameService;
+import service.GeneralService;
 import service.UserService;
 import spark.*;
 
@@ -34,11 +35,12 @@ public class Server {
         UserDAO userDAO = new MemoryUserDAO();
         AuthDAO authDAO = new MemoryAuthDAO();
         GameDAO gameDAO = new MemoryGameDAO();
-        UserService userService = new UserService(userDAO, gameDAO, authDAO);
-        GameService gameService = new GameService(userDAO, gameDAO, authDAO);
+        UserService userService = new UserService(userDAO, authDAO);
+        GameService gameService = new GameService(gameDAO, authDAO);
+        GeneralService generalService = new GeneralService(userDAO, gameDAO, authDAO);
 
         // Deletes
-        ClearHandler clearHandler = new ClearHandler(userService, gameService);
+        ClearHandler clearHandler = new ClearHandler(generalService);
         delete("/db", clearHandler);
 
         LogoutHandler logoutHandler = new LogoutHandler(userService);

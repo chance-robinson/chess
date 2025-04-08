@@ -22,46 +22,19 @@ import server.net.result.ListGamesResult;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class GameServiceTest {
-    private UserDAO userDAO;
     private GameDAO gameDAO;
     private AuthDAO authDAO;
-    private UserService userService;
     private GameService gameService;
-    private UserData testUser;
     private AuthData testAuth;
     private AuthData testAuth2;
 
     @BeforeEach
     public void initialize() {
-        userDAO = new MemoryUserDAO();
         gameDAO = new MemoryGameDAO();
         authDAO = new MemoryAuthDAO();
-        userService = new UserService(userDAO, gameDAO, authDAO);
-        gameService = new GameService(userDAO, gameDAO, authDAO);
-        testUser = new UserData("testUser", "testPass", "test@example.com");
+        gameService = new GameService(gameDAO, authDAO);
         testAuth = new AuthData("testAuth", "testUser");
         testAuth2 = new AuthData("testAuth2", "testUser2");
-    }
-
-    @Test
-    public void clear() {
-        userDAO.createUser(testUser);
-
-        int generatedGameID = gameDAO.generateGameID();
-        GameData game = new GameData(generatedGameID, null, null, "testGameName", new ChessGame());
-        gameDAO.createGame(game);
-
-        authDAO.createAuth(testAuth.authToken(), testAuth);
-
-        assertNotNull(userDAO.getUser(testUser.username()));
-        assertNotNull(gameDAO.getGame(generatedGameID));
-        assertNotNull(authDAO.getAuth(testAuth.authToken()));
-
-        userService.clear();
-
-        assertNull(userDAO.getUser(testUser.username()));
-        assertNull(gameDAO.getGame(generatedGameID));
-        assertNull(authDAO.getAuth(testAuth.authToken()));
     }
 
     @Test

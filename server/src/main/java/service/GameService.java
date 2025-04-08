@@ -3,7 +3,6 @@ package service;
 import chess.ChessGame;
 import dataAccess.dao.AuthDAO;
 import dataAccess.dao.GameDAO;
-import dataAccess.dao.UserDAO;
 import model.AuthData;
 import model.GameData;
 import server.ServerException;
@@ -16,20 +15,12 @@ import server.net.result.ListGamesResult;
 import java.util.Objects;
 
 public class GameService {
-    final UserDAO userDAO;
     final GameDAO gameDAO;
     final AuthDAO authDAO;
 
-    public GameService(UserDAO userDAO, GameDAO gameDAO, AuthDAO authDAO) {
-        this.userDAO = userDAO;
+    public GameService(GameDAO gameDAO, AuthDAO authDAO) {
         this.gameDAO = gameDAO;
         this.authDAO = authDAO;
-    }
-
-    public void clear() {
-        userDAO.clear();
-        gameDAO.clear();
-        authDAO.clear();
     }
 
     public ListGamesResult listGames(String authToken) throws ServerException {

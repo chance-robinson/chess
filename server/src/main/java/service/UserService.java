@@ -1,7 +1,6 @@
 package service;
 
 import dataAccess.dao.AuthDAO;
-import dataAccess.dao.GameDAO;
 import dataAccess.dao.UserDAO;
 import model.AuthData;
 import model.UserData;
@@ -17,20 +16,12 @@ import java.util.UUID;
 
 public class UserService {
     final UserDAO userDAO;
-    final GameDAO gameDAO;
     final AuthDAO authDAO;
 
 
-    public UserService(UserDAO userDAO, GameDAO gameDAO, AuthDAO authDAO) {
+    public UserService(UserDAO userDAO, AuthDAO authDAO) {
         this.userDAO = userDAO;
-        this.gameDAO = gameDAO;
         this.authDAO = authDAO;
-    }
-
-    public void clear() {
-        userDAO.clear();
-        gameDAO.clear();
-        authDAO.clear();
     }
 
     public RegisterResult register(RegisterRequest req) throws ServerException {
