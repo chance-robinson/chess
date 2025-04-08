@@ -89,7 +89,8 @@ public class Rule {
         if (board.isValidPosition(new ChessPosition(tempRow1, startCol))) {
             ChessPiece pieceAtNewPosition1 = board.getPiece(new ChessPosition(tempRow1, startCol));
             if (pieceAtNewPosition1 == null) {
-                if ((tempRow1 == 1 && pieceAtCurPosition.getTeamColor() == ChessGame.TeamColor.BLACK) || (tempRow1 == 8 && pieceAtCurPosition.getTeamColor() == ChessGame.TeamColor.WHITE)) {
+                if ((tempRow1 == 1 && pieceAtCurPosition.getTeamColor() == ChessGame.TeamColor.BLACK) ||
+                        (tempRow1 == 8 && pieceAtCurPosition.getTeamColor() == ChessGame.TeamColor.WHITE)) {
                     chessMoves.add(new ChessMove(myPosition, new ChessPosition(tempRow1, startCol), ChessPiece.PieceType.ROOK));
                     chessMoves.add(new ChessMove(myPosition, new ChessPosition(tempRow1, startCol), ChessPiece.PieceType.BISHOP));
                     chessMoves.add(new ChessMove(myPosition, new ChessPosition(tempRow1, startCol), ChessPiece.PieceType.KNIGHT));
@@ -105,7 +106,8 @@ public class Rule {
             ChessPiece pieceAtNewPosition1 = board.getPiece(new ChessPosition(tempRow1, startCol));
             ChessPiece pieceAtNewPosition2 = board.getPiece(new ChessPosition(tempRow2, startCol));
             if (pieceAtNewPosition1 == null && pieceAtNewPosition2 == null) {
-                if ((startRow == 7 && pieceAtCurPosition.getTeamColor() == ChessGame.TeamColor.BLACK) || (startRow == 2 && pieceAtCurPosition.getTeamColor() == ChessGame.TeamColor.WHITE)) {
+                if ((startRow == 7 && pieceAtCurPosition.getTeamColor() == ChessGame.TeamColor.BLACK) ||
+                        (startRow == 2 && pieceAtCurPosition.getTeamColor() == ChessGame.TeamColor.WHITE)) {
                     chessMoves.add(new ChessMove(myPosition, new ChessPosition(tempRow2, startCol), null));
                 }
             }
@@ -116,7 +118,8 @@ public class Rule {
         if (board.isValidPosition(new ChessPosition(tempRow1, startCol+1))) {
             ChessPiece pieceAtNewPosition1 = board.getPiece(new ChessPosition(tempRow1, startCol+1));
             if (pieceAtNewPosition1 != null && pieceAtCurPosition.getTeamColor() != pieceAtNewPosition1.getTeamColor()) {
-                if ((tempRow1 == 1 && pieceAtCurPosition.getTeamColor() == ChessGame.TeamColor.BLACK) || (tempRow1 == 7 && pieceAtCurPosition.getTeamColor() == ChessGame.TeamColor.BLACK)) {
+                if ((tempRow1 == 1 && pieceAtCurPosition.getTeamColor() == ChessGame.TeamColor.BLACK) ||
+                        (tempRow1 == 7 && pieceAtCurPosition.getTeamColor() == ChessGame.TeamColor.BLACK)) {
                     chessMoves.add(new ChessMove(myPosition, new ChessPosition(tempRow1, startCol+1), ChessPiece.PieceType.ROOK));
                     chessMoves.add(new ChessMove(myPosition, new ChessPosition(tempRow1, startCol+1), ChessPiece.PieceType.BISHOP));
                     chessMoves.add(new ChessMove(myPosition, new ChessPosition(tempRow1, startCol+1), ChessPiece.PieceType.KNIGHT));
@@ -130,7 +133,8 @@ public class Rule {
         if (board.isValidPosition(new ChessPosition(tempRow1, startCol-1))) {
             ChessPiece pieceAtNewPosition1 = board.getPiece(new ChessPosition(tempRow1, startCol-1));
             if (pieceAtNewPosition1 != null && pieceAtCurPosition.getTeamColor() != pieceAtNewPosition1.getTeamColor()) {
-                if ((tempRow1 == 1 && pieceAtCurPosition.getTeamColor() == ChessGame.TeamColor.BLACK) || (tempRow1 == 8 && pieceAtCurPosition.getTeamColor() == ChessGame.TeamColor.WHITE)) {
+                if ((tempRow1 == 1 && pieceAtCurPosition.getTeamColor() == ChessGame.TeamColor.BLACK) ||
+                        (tempRow1 == 8 && pieceAtCurPosition.getTeamColor() == ChessGame.TeamColor.WHITE)) {
                     chessMoves.add(new ChessMove(myPosition, new ChessPosition(tempRow1, startCol-1), ChessPiece.PieceType.ROOK));
                     chessMoves.add(new ChessMove(myPosition, new ChessPosition(tempRow1, startCol-1), ChessPiece.PieceType.BISHOP));
                     chessMoves.add(new ChessMove(myPosition, new ChessPosition(tempRow1, startCol-1), ChessPiece.PieceType.KNIGHT));

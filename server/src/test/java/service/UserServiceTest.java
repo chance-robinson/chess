@@ -1,9 +1,9 @@
 package service;
 
-import dataAccess.dao.AuthDAO;
-import dataAccess.dao.UserDAO;
-import dataAccess.dao.memory.MemoryAuthDAO;
-import dataAccess.dao.memory.MemoryUserDAO;
+import dataaccess.dao.AuthDAO;
+import dataaccess.dao.UserDAO;
+import dataaccess.dao.memory.MemoryAuthDAO;
+import dataaccess.dao.memory.MemoryUserDAO;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,7 +46,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void register_usernameTaken() {
+    public void registerUsernameTaken() {
         userDAO.createUser(testUser);
 
         RegisterRequest request = new RegisterRequest(testUser.username(), testUser.password(), "differentemail@email.com");
@@ -58,7 +58,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void register_emailTaken() {
+    public void registerEmailTaken() {
         userDAO.createUser(testUser);
 
         RegisterRequest request = new RegisterRequest("differentTestUser", testUser.password(), testUser.email());
@@ -71,9 +71,9 @@ public class UserServiceTest {
 
     @Test
     public void login() {
-        RegisterRequest reg_request = new RegisterRequest(testUser.username(), testUser.password(), testUser.email());
-        RegisterResult reg_result = userService.register(reg_request);
-        assertNotNull(reg_result);
+        RegisterRequest regRequest = new RegisterRequest(testUser.username(), testUser.password(), testUser.email());
+        RegisterResult regResult = userService.register(regRequest);
+        assertNotNull(regResult);
 
         LoginRequest request = new LoginRequest(testUser.username(), testUser.password());
         LoginResult result = userService.login(request);
@@ -84,10 +84,10 @@ public class UserServiceTest {
     }
 
     @Test
-    public void login_badUsername() {
-        RegisterRequest reg_request = new RegisterRequest(testUser.username(), testUser.password(), testUser.email());
-        RegisterResult reg_result = userService.register(reg_request);
-        assertNotNull(reg_result);
+    public void loginBadUsername() {
+        RegisterRequest regRequest = new RegisterRequest(testUser.username(), testUser.password(), testUser.email());
+        RegisterResult regResult = userService.register(regRequest);
+        assertNotNull(regResult);
 
         LoginRequest request = new LoginRequest("badUser", testUser.password());
 
@@ -98,10 +98,10 @@ public class UserServiceTest {
     }
 
     @Test
-    public void login_badPassword() {
-        RegisterRequest reg_request = new RegisterRequest(testUser.username(), testUser.password(), testUser.email());
-        RegisterResult reg_result = userService.register(reg_request);
-        assertNotNull(reg_result);
+    public void loginBadPassword() {
+        RegisterRequest regRequest = new RegisterRequest(testUser.username(), testUser.password(), testUser.email());
+        RegisterResult regResult = userService.register(regRequest);
+        assertNotNull(regResult);
 
         LoginRequest request = new LoginRequest(testUser.username(), "badPassword");
 
@@ -113,28 +113,28 @@ public class UserServiceTest {
 
     @Test
     public void logout() {
-        RegisterRequest reg_request = new RegisterRequest(testUser.username(), testUser.password(), testUser.email());
-        RegisterResult reg_result = userService.register(reg_request);
-        assertNotNull(reg_result);
+        RegisterRequest regRequest = new RegisterRequest(testUser.username(), testUser.password(), testUser.email());
+        RegisterResult regResult = userService.register(regRequest);
+        assertNotNull(regResult);
 
-        LoginRequest login_request = new LoginRequest(testUser.username(), testUser.password());
-        LoginResult login_result = userService.login(login_request);
-        assertNotNull(login_result);
+        LoginRequest loginRequest = new LoginRequest(testUser.username(), testUser.password());
+        LoginResult loginResult = userService.login(loginRequest);
+        assertNotNull(loginResult);
 
-        EmptyResult result = userService.logout(login_result.authToken());
+        EmptyResult result = userService.logout(loginResult.authToken());
 
         assertEquals(new EmptyResult(), result);
     }
 
     @Test
-    public void logout_badAuthToken() {
-        RegisterRequest reg_request = new RegisterRequest(testUser.username(), testUser.password(), testUser.email());
-        RegisterResult reg_result = userService.register(reg_request);
-        assertNotNull(reg_result);
+    public void logoutBadAuthToken() {
+        RegisterRequest regRequest = new RegisterRequest(testUser.username(), testUser.password(), testUser.email());
+        RegisterResult regResult = userService.register(regRequest);
+        assertNotNull(regResult);
 
-        LoginRequest login_request = new LoginRequest(testUser.username(), testUser.password());
-        LoginResult login_result = userService.login(login_request);
-        assertNotNull(login_result);
+        LoginRequest loginRequest = new LoginRequest(testUser.username(), testUser.password());
+        LoginResult loginResult = userService.login(loginRequest);
+        assertNotNull(loginResult);
 
         ServerException exception = assertThrows(ServerException.class, () -> userService.logout("badAuthToken"));
 

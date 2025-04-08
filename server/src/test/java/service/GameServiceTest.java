@@ -1,9 +1,9 @@
 package service;
 
-import dataAccess.dao.AuthDAO;
-import dataAccess.dao.GameDAO;
-import dataAccess.dao.memory.MemoryAuthDAO;
-import dataAccess.dao.memory.MemoryGameDAO;
+import dataaccess.dao.AuthDAO;
+import dataaccess.dao.GameDAO;
+import dataaccess.dao.memory.MemoryAuthDAO;
+import dataaccess.dao.memory.MemoryGameDAO;
 import model.AuthData;
 import model.GameData;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,29 +44,29 @@ public class GameServiceTest {
     }
 
     @Test
-    public void createGame_duplicateGameName() {
+    public void createGameDuplicateGameName() {
         String gameName = "testGame";
 
         authDAO.createAuth(testAuth.authToken(), testAuth);
 
-        CreateGameRequest createGameRequest_1 = new CreateGameRequest(gameName);
-        CreateGameResult createGameResult_1 = gameService.createGame(createGameRequest_1, testAuth.authToken());
-        assertNotNull(createGameResult_1.gameID());
+        CreateGameRequest createGameRequest1 = new CreateGameRequest(gameName);
+        CreateGameResult createGameResult1 = gameService.createGame(createGameRequest1, testAuth.authToken());
+        assertNotNull(createGameResult1.gameID());
 
-        CreateGameRequest createGameRequest_2 = new CreateGameRequest(gameName);
+        CreateGameRequest createGameRequest2 = new CreateGameRequest(gameName);
 
-        ServerException exception = assertThrows(ServerException.class, () -> gameService.createGame(createGameRequest_2, testAuth.authToken()));
+        ServerException exception = assertThrows(ServerException.class, () -> gameService.createGame(createGameRequest2, testAuth.authToken()));
 
         assertEquals("Error: bad request", exception.getMessage());
         assertEquals(400, exception.getStatusCode());
     }
 
     @Test
-    public void createGame_badAuthToken() {
+    public void createGameBadAuthToken() {
         String gameName = "testGame";
 
-        CreateGameRequest createGameRequest_1 = new CreateGameRequest(gameName);
-        ServerException exception = assertThrows(ServerException.class, () -> gameService.createGame(createGameRequest_1, "badAuthToken"));
+        CreateGameRequest createGameRequest1 = new CreateGameRequest(gameName);
+        ServerException exception = assertThrows(ServerException.class, () -> gameService.createGame(createGameRequest1, "badAuthToken"));
 
         assertEquals("Error: unauthorized", exception.getMessage());
         assertEquals(401, exception.getStatusCode());
@@ -76,13 +76,13 @@ public class GameServiceTest {
     public void listGames() {
         authDAO.createAuth(testAuth.authToken(), testAuth);
 
-        CreateGameRequest createGameRequest_1 = new CreateGameRequest("testGame1");
-        CreateGameResult createGameResult_1 = gameService.createGame(createGameRequest_1, testAuth.authToken());
-        assertNotNull(createGameResult_1.gameID());
+        CreateGameRequest createGameRequest1 = new CreateGameRequest("testGame1");
+        CreateGameResult createGameResult1 = gameService.createGame(createGameRequest1, testAuth.authToken());
+        assertNotNull(createGameResult1.gameID());
 
-        CreateGameRequest createGameRequest_2 = new CreateGameRequest("testGame2");
-        CreateGameResult createGameResult_2 = gameService.createGame(createGameRequest_2, testAuth.authToken());
-        assertNotNull(createGameResult_2.gameID());
+        CreateGameRequest createGameRequest2 = new CreateGameRequest("testGame2");
+        CreateGameResult createGameResult2 = gameService.createGame(createGameRequest2, testAuth.authToken());
+        assertNotNull(createGameResult2.gameID());
 
         ListGamesResult listGamesResult = gameService.listGames(testAuth.authToken());
 
@@ -90,7 +90,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void listGames_badAuth() {
+    public void listGamesBadAuthToken() {
         ServerException exception = assertThrows(ServerException.class, () -> gameService.listGames("badAuthToken"));
 
         assertEquals("Error: unauthorized", exception.getMessage());
@@ -120,7 +120,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void joinGame_badAuthToken() {
+    public void joinGameBadAuthToken() {
         authDAO.createAuth(testAuth.authToken(), testAuth);
 
         CreateGameRequest createGameRequest = new CreateGameRequest("testGame");
@@ -135,7 +135,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void joinGame_alreadyTaken() {
+    public void joinGameAlreadyTaken() {
         authDAO.createAuth(testAuth.authToken(), testAuth);
         authDAO.createAuth(testAuth2.authToken(), testAuth2);
 
@@ -162,7 +162,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void joinGame_badGameID() {
+    public void joinGameBadGameID() {
         authDAO.createAuth(testAuth.authToken(), testAuth);
 
         JoinGameRequest joinGameRequest = new JoinGameRequest("WHITE", 999);

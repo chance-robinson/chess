@@ -1,4 +1,4 @@
-package dataAccess.dao.sql;
+package dataaccess.dao.sql;
 
 public class SQLUserDAO {
 }

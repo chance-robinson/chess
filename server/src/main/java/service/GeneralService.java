@@ -1,8 +1,8 @@
 package service;
 
-import dataAccess.dao.AuthDAO;
-import dataAccess.dao.GameDAO;
-import dataAccess.dao.UserDAO;
+import dataaccess.dao.AuthDAO;
+import dataaccess.dao.GameDAO;
+import dataaccess.dao.UserDAO;
 
 public class GeneralService {
     final UserDAO userDAO;

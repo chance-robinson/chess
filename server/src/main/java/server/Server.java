@@ -1,11 +1,11 @@
 package server;
 
-import dataAccess.dao.AuthDAO;
-import dataAccess.dao.GameDAO;
-import dataAccess.dao.UserDAO;
-import dataAccess.dao.memory.MemoryAuthDAO;
-import dataAccess.dao.memory.MemoryGameDAO;
-import dataAccess.dao.memory.MemoryUserDAO;
+import dataaccess.dao.AuthDAO;
+import dataaccess.dao.GameDAO;
+import dataaccess.dao.UserDAO;
+import dataaccess.dao.memory.MemoryAuthDAO;
+import dataaccess.dao.memory.MemoryGameDAO;
+import dataaccess.dao.memory.MemoryUserDAO;
 import handler.*;
 import service.GameService;
 import service.GeneralService;
