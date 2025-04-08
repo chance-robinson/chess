@@ -13,7 +13,9 @@ import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.ServerException;
+import server.net.request.LoginRequest;
 import server.net.request.RegisterRequest;
+import server.net.result.LoginResult;
 import server.net.result.RegisterResult;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -63,6 +65,8 @@ public class UserServiceTest {
 
         RegisterResult result = userService.register(request);
 
+        assertNotNull(result);
+
         UserData createdUser = userDAO.getUser(testUser.username());
         assertNotNull(createdUser);
 
@@ -100,10 +104,48 @@ public class UserServiceTest {
     }
 
     @Test
-    public void validAuthToken() {
-        String generatedAuthToken = userService.generateAuthToken();
+    public void login() {
+        RegisterRequest reg_request = new RegisterRequest(testUser.username(), testUser.password(), testUser.email());
+        RegisterResult reg_result = userService.register(reg_request);
+        assertNotNull(reg_result);
 
-        assertNotNull(generatedAuthToken);
-        assertTrue(generatedAuthToken.matches("^[a-f0-9\\-]{36}$"));
+        LoginRequest request = new LoginRequest(testUser.username(), testUser.password());
+        LoginResult result = userService.login(request);
+        assertNotNull(result);
+
+        assertEquals(testUser.username(), result.username());
+        assertNotNull(result.authToken());
+    }
+
+    @Test
+    public void login_badUsername() throws ServerException {
+        RegisterRequest reg_request = new RegisterRequest(testUser.username(), testUser.password(), testUser.email());
+        RegisterResult reg_result = userService.register(reg_request);
+        assertNotNull(reg_result);
+
+        LoginRequest request = new LoginRequest("badUser", testUser.password());
+
+        ServerException exception = assertThrows(ServerException.class, () -> {
+            userService.login(request);
+        });
+
+        assertEquals("Error: unauthorized", exception.getMessage());
+        assertEquals(401, exception.getStatusCode());
+    }
+
+    @Test
+    public void login_badPassword() throws ServerException {
+        RegisterRequest reg_request = new RegisterRequest(testUser.username(), testUser.password(), testUser.email());
+        RegisterResult reg_result = userService.register(reg_request);
+        assertNotNull(reg_result);
+
+        LoginRequest request = new LoginRequest(testUser.username(), "badPassword");
+
+        ServerException exception = assertThrows(ServerException.class, () -> {
+            userService.login(request);
+        });
+
+        assertEquals("Error: unauthorized", exception.getMessage());
+        assertEquals(401, exception.getStatusCode());
     }
 }
