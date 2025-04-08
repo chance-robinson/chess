@@ -46,4 +46,10 @@ public class MemoryGameDAO implements GameDAO {
         }
         return null;
     }
+
+    @Override
+    public void update(GameData gameData) {
+        games.remove(gameData.gameID());
+        games.put(gameData.gameID(), gameData);
+    }
 }
