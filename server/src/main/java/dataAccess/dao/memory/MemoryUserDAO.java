@@ -22,4 +22,14 @@ public class MemoryUserDAO implements UserDAO {
     public UserData getUser(String username) {
         return users.get(username);
     }
+
+    @Override
+    public UserData getUserByEmail(String email) {
+        for (UserData user : users.values()) {
+            if (user.email().equals(email)) {
+                return user;
+            }
+        }
+        return null;
+    }
 }

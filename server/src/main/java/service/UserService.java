@@ -3,6 +3,13 @@ package service;
 import dataAccess.dao.AuthDAO;
 import dataAccess.dao.GameDAO;
 import dataAccess.dao.UserDAO;
+import model.AuthData;
+import model.UserData;
+import server.ServerException;
+import server.net.request.RegisterRequest;
+import server.net.result.RegisterResult;
+
+import java.util.UUID;
 
 public class UserService {
     final UserDAO userDAO;
@@ -20,5 +27,30 @@ public class UserService {
         userDAO.clear();
         gameDAO.clear();
         authDAO.clear();
+    }
+
+    public RegisterResult register(RegisterRequest req) throws ServerException {
+        String email = req.email();
+        String username = req.username();
+        String password = req.password();
+
+        if (email == null || username == null || password == null) {
+            throw new ServerException("Error: bad request", 400);
+        }
+
+        if (userDAO.getUser(username) != null || userDAO.getUserByEmail(email) != null) {
+            throw new ServerException("Error: already taken", 403);
+        }
+
+        String generatedAuthToken = generateAuthToken();
+
+        userDAO.createUser(new UserData(username, password, email));
+        authDAO.createAuth(generatedAuthToken, new AuthData(generatedAuthToken, username));
+
+        return new RegisterResult(username, generatedAuthToken);
+    }
+
+    public String generateAuthToken() {
+        return UUID.randomUUID().toString();
     }
 }
