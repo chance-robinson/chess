@@ -45,7 +45,7 @@ public class Server {
         delete("/session", logoutHandler);
 
         // Posts
-        RegisterHandler registerHandler = new RegisterHandler();
+        RegisterHandler registerHandler = new RegisterHandler(userService);
         post("/user", registerHandler);
 
         LoginHandler loginHandler = new LoginHandler();
