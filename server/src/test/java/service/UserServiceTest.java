@@ -1,22 +1,41 @@
 package service;
 
+import chess.ChessGame;
+import dataAccess.dao.GameDAO;
+import dataAccess.dao.UserDAO;
+import dataAccess.dao.memory.MemoryGameDAO;
 import dataAccess.dao.memory.MemoryUserDAO;
+import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class UserServiceTest {
+
     @Test
     public void clearPositive() {
-        UserService userService = new UserService(new MemoryUserDAO());
+        UserDAO userDAO = new MemoryUserDAO();
+        GameDAO gameDAO = new MemoryGameDAO();
+        UserService userService = new UserService(userDAO, gameDAO);
 
+        // Populate userDAO
         UserData user = new UserData("testUser", "testPass", "test@example.com");
-        userService.userDAO.createUser(user);
+        userDAO.createUser(user);
 
-        assertNotNull(userService.userDAO.getUser("testUser"));
+        assertNotNull(userDAO.getUser("testUser"));
 
+        // Populate gameDAO
+        int generatedGameID = gameDAO.generateGameID();
+        GameData game = new GameData(generatedGameID, null, null, "testGameName", new ChessGame());
+        gameDAO.createGame(game);
+
+        assertNotNull(gameDAO.getGame(generatedGameID));
+
+        // Clear
         userService.clear();
 
-        assertNull(userService.userDAO.getUser("testUser"));
+        // Checks
+        assertNull(userDAO.getUser("testUser"));
+        assertNull(gameDAO.getGame(generatedGameID));
     }
 }
