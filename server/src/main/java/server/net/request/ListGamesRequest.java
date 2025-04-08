@@ -1,3 +1,3 @@
 package server.net.request;
 
-public record ListGamesRequest() {}
+public record ListGamesRequest(String authToken) {}

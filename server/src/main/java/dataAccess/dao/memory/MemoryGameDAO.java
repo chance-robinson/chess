@@ -3,6 +3,7 @@ package dataAccess.dao.memory;
 import dataAccess.dao.GameDAO;
 import model.GameData;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class MemoryGameDAO implements GameDAO {
@@ -28,5 +29,10 @@ public class MemoryGameDAO implements GameDAO {
     @Override
     public int generateGameID() {
         return newGameID++;
+    }
+
+    @Override
+    public ArrayList<GameData> getAllGames() {
+        return new ArrayList<>(games.values());
     }
 }

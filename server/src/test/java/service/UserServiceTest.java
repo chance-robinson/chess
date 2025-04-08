@@ -41,7 +41,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void clear() throws ServerException {
+    public void clear() {
         userDAO.createUser(testUser);
 
         int generatedGameID = gameDAO.generateGameID();
@@ -78,7 +78,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void register_usernameTaken() throws ServerException {
+    public void register_usernameTaken() {
         userDAO.createUser(testUser);
 
         RegisterRequest request = new RegisterRequest(testUser.username(), testUser.password(), "differentemail@email.com");
@@ -92,7 +92,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void register_emailTaken() throws ServerException {
+    public void register_emailTaken() {
         userDAO.createUser(testUser);
 
         RegisterRequest request = new RegisterRequest("differentTestUser", testUser.password(), testUser.email());
@@ -120,7 +120,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void login_badUsername() throws ServerException {
+    public void login_badUsername() {
         RegisterRequest reg_request = new RegisterRequest(testUser.username(), testUser.password(), testUser.email());
         RegisterResult reg_result = userService.register(reg_request);
         assertNotNull(reg_result);
@@ -136,7 +136,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void login_badPassword() throws ServerException {
+    public void login_badPassword() {
         RegisterRequest reg_request = new RegisterRequest(testUser.username(), testUser.password(), testUser.email());
         RegisterResult reg_result = userService.register(reg_request);
         assertNotNull(reg_result);
@@ -169,7 +169,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void logout_badAuthToken() throws ServerException {
+    public void logout_badAuthToken() {
         RegisterRequest reg_request = new RegisterRequest(testUser.username(), testUser.password(), testUser.email());
         RegisterResult reg_result = userService.register(reg_request);
         assertNotNull(reg_result);

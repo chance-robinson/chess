@@ -1,4 +1,44 @@
 package service;
 
+import dataAccess.dao.AuthDAO;
+import dataAccess.dao.GameDAO;
+import dataAccess.dao.UserDAO;
+import model.AuthData;
+import server.ServerException;
+import server.net.request.ListGamesRequest;
+import server.net.result.ListGamesResult;
+
+import java.util.UUID;
+
 public class GameService {
+    final UserDAO userDAO;
+    final GameDAO gameDAO;
+    final AuthDAO authDAO;
+
+    public GameService(UserDAO userDAO, GameDAO gameDAO, AuthDAO authDAO) {
+        this.userDAO = userDAO;
+        this.gameDAO = gameDAO;
+        this.authDAO = authDAO;
+    }
+
+    public void clear() {
+        userDAO.clear();
+        gameDAO.clear();
+        authDAO.clear();
+    }
+
+    public ListGamesResult listGames(ListGamesRequest req) throws ServerException {
+        String authToken = req.authToken();
+
+        AuthData authData = authDAO.getAuth(authToken);
+        if (authData == null) {
+            throw new ServerException("Error: unauthorized", 401);
+        }
+
+        return new ListGamesResult(gameDAO.getAllGames());
+    }
+
+    public String generateAuthToken() {
+        return UUID.randomUUID().toString();
+    }
 }
