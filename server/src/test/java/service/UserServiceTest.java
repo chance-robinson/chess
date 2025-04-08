@@ -1,14 +1,9 @@
 package service;
 
-import chess.ChessGame;
 import dataAccess.dao.AuthDAO;
-import dataAccess.dao.GameDAO;
 import dataAccess.dao.UserDAO;
 import dataAccess.dao.memory.MemoryAuthDAO;
-import dataAccess.dao.memory.MemoryGameDAO;
 import dataAccess.dao.memory.MemoryUserDAO;
-import model.AuthData;
-import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,9 +20,6 @@ public class UserServiceTest {
     private UserDAO userDAO;
     private UserService userService;
     private UserData testUser;
-    private GameDAO gameDAO;
-    private AuthDAO authDAO;
-    private GameService gameService;
 
     @BeforeEach
     public void initialize() {
