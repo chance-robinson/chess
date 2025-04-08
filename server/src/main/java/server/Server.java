@@ -6,6 +6,9 @@ import dataaccess.dao.UserDAO;
 import dataaccess.dao.memory.MemoryAuthDAO;
 import dataaccess.dao.memory.MemoryGameDAO;
 import dataaccess.dao.memory.MemoryUserDAO;
+import dataaccess.dao.sql.SQLAuthDAO;
+import dataaccess.dao.sql.SQLGameDAO;
+import dataaccess.dao.sql.SQLUserDAO;
 import handler.*;
 import service.GameService;
 import service.GeneralService;
@@ -41,9 +44,20 @@ public class Server {
      * Creates the routes on Spark using the dedicated handlers for a specified path
      */
     private static void createRoutes() {
-        UserDAO userDAO = new MemoryUserDAO();
-        AuthDAO authDAO = new MemoryAuthDAO();
-        GameDAO gameDAO = new MemoryGameDAO();
+        UserDAO userDAO;
+        AuthDAO authDAO;
+        GameDAO gameDAO;
+
+        boolean useSQL = false;
+        if (useSQL) {
+            userDAO = new SQLUserDAO();
+            authDAO = new SQLAuthDAO();
+            gameDAO = new SQLGameDAO();
+        } else {
+            userDAO = new MemoryUserDAO();
+            authDAO = new MemoryAuthDAO();
+            gameDAO = new MemoryGameDAO();
+        }
         UserService userService = new UserService(userDAO, authDAO);
         GameService gameService = new GameService(gameDAO, authDAO);
         GeneralService generalService = new GeneralService(userDAO, gameDAO, authDAO);
