@@ -14,8 +14,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.ServerException;
 import server.net.request.LoginRequest;
+import server.net.request.LogoutRequest;
 import server.net.request.RegisterRequest;
 import server.net.result.LoginResult;
+import server.net.result.LogoutResult;
 import server.net.result.RegisterResult;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -143,6 +145,43 @@ public class UserServiceTest {
 
         ServerException exception = assertThrows(ServerException.class, () -> {
             userService.login(request);
+        });
+
+        assertEquals("Error: unauthorized", exception.getMessage());
+        assertEquals(401, exception.getStatusCode());
+    }
+
+    @Test
+    public void logout() {
+        RegisterRequest reg_request = new RegisterRequest(testUser.username(), testUser.password(), testUser.email());
+        RegisterResult reg_result = userService.register(reg_request);
+        assertNotNull(reg_result);
+
+        LoginRequest login_request = new LoginRequest(testUser.username(), testUser.password());
+        LoginResult login_result = userService.login(login_request);
+        assertNotNull(login_result);
+
+        String authToken = login_result.authToken();
+        LogoutRequest request = new LogoutRequest(authToken);
+        LogoutResult result = userService.logout(request);
+
+        assertEquals(new LogoutResult(), result);
+    }
+
+    @Test
+    public void logout_badAuthToken() throws ServerException {
+        RegisterRequest reg_request = new RegisterRequest(testUser.username(), testUser.password(), testUser.email());
+        RegisterResult reg_result = userService.register(reg_request);
+        assertNotNull(reg_result);
+
+        LoginRequest login_request = new LoginRequest(testUser.username(), testUser.password());
+        LoginResult login_result = userService.login(login_request);
+        assertNotNull(login_result);
+
+        LogoutRequest request = new LogoutRequest("badAuthToken");
+
+        ServerException exception = assertThrows(ServerException.class, () -> {
+            userService.logout(request);
         });
 
         assertEquals("Error: unauthorized", exception.getMessage());
