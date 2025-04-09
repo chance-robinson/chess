@@ -9,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.*;
 public abstract class AuthDAOTest {
     private AuthDAO authDAO;
     private AuthData testAuth;
-    private AuthData testAuth2;
 
     protected abstract AuthDAO createAuthDAO();
 
@@ -18,7 +17,6 @@ public abstract class AuthDAOTest {
         this.authDAO = createAuthDAO();
         authDAO.clear();
         this.testAuth = new AuthData("testAuth", "testUser");
-        this.testAuth2 = new AuthData("testAuth2", "testUser2");
     }
 
     @Test
