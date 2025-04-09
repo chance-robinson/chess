@@ -6,6 +6,7 @@ import dataaccess.DatabaseManager;
 import dataaccess.dao.GameDAO;
 import model.AuthData;
 import model.GameData;
+import model.UserData;
 import server.ServerException;
 
 import java.sql.SQLException;
@@ -129,6 +130,25 @@ public class SQLGameDAO implements GameDAO {
      */
     @Override
     public GameData getGameByGameName(String gameName) {
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT * FROM gameData WHERE gameName=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, gameName);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return new GameData(
+                                rs.getInt("gameID"),
+                                rs.getString("whiteUsername"),
+                                rs.getString("blackUsername"),
+                                rs.getString("gameName"),
+                                new Gson().fromJson(rs.getString("game"), ChessGame.class)
+                        );
+                    }
+                }
+            }
+        } catch (ServerException | SQLException e) {
+            throw new RuntimeException("Unable to getGameByGameName", e);
+        }
         return null;
     }
 
