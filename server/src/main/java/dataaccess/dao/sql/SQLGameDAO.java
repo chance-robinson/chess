@@ -1,6 +1,5 @@
 package dataaccess.dao.sql;
 
-import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
 import dataaccess.dao.GameDAO;
 import model.GameData;
@@ -18,8 +17,8 @@ public class SQLGameDAO implements GameDAO {
               `whiteUsername` varchar(256),
               `blackUsername` varchar(256),
               `gameName` varchar(256) NOT NULL,
-              PRIMARY KEY (`gameID`),
-              json TEXT DEFAULT NULL
+              `game` longtext DEFAULT NULL,
+              PRIMARY KEY (`gameID`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
         };
@@ -32,7 +31,11 @@ public class SQLGameDAO implements GameDAO {
      */
     @Override
     public void clear() {
-
+        try {
+            DatabaseManager.executeUpdate("TRUNCATE gameData");
+        } catch (ServerException e) {
+            throw new RuntimeException("Unable to clear", e);
+        }
     }
 
     /**
@@ -42,7 +45,14 @@ public class SQLGameDAO implements GameDAO {
      */
     @Override
     public void createGame(GameData gameData) {
-
+        var statement = "INSERT INTO gameData(gameName, whiteUsername, " +
+                "blackUsername, gameName, game) VALUES (?, ?, ?, ?, ?)";
+        try {
+            DatabaseManager.executeUpdate(statement, gameData.gameName(),
+                    gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), gameData.game());
+        } catch (ServerException e) {
+            throw new RuntimeException("Unable to createGame", e);
+        }
     }
 
     /**
