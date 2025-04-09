@@ -33,6 +33,9 @@ public abstract class GeneralServiceTest {
         this.gameDAO = createGameDAO();
         this.authDAO = createAuthDAO();
         this.userDAO = createUserDAO();
+        userDAO.clear();
+        gameDAO.clear();
+        authDAO.clear();
         this.generalService = new GeneralService(userDAO, gameDAO, authDAO);
         this.testAuth = new AuthData("testAuth", "testUser");
         this.testUser = new UserData("testUser", "testPass", "test@example.com");

@@ -28,6 +28,8 @@ public abstract class GameServiceTest {
     public void initialize() {
         this.gameDAO = createGameDAO();
         this.authDAO = createAuthDAO();
+        gameDAO.clear();
+        authDAO.clear();
         this.gameService = new GameService(gameDAO, authDAO);
         this.testAuth = new AuthData("testAuth", "testUser");
         this.testAuth2 = new AuthData("testAuth2", "testUser2");

@@ -30,6 +30,8 @@ public abstract class UserServiceTest {
     public void initialize() {
         this.userDAO = createUserDAO();
         this.authDAO = createAuthDAO();
+        userDAO.clear();
+        authDAO.clear();
         this.userService = new UserService(userDAO, authDAO);
         this.testUser = new UserData("testUser", "testPass", "test@example.com");
     }
