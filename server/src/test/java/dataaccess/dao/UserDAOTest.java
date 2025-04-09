@@ -45,7 +45,7 @@ public abstract class UserDAOTest {
     public void getUser() {
         userDAO.createUser(testUser);
         UserData retrievedUser = userDAO.getUser(testUser.username());
-        assertEquals(retrievedUser.email(), testUser.email());
+
         assertEquals(retrievedUser.username(), testUser.username());
     }
 
@@ -59,8 +59,8 @@ public abstract class UserDAOTest {
     public void getUserByEmail() {
         userDAO.createUser(testUser);
         UserData retrievedUser = userDAO.getUser(testUser.username());
+
         assertEquals(retrievedUser.email(), testUser.email());
-        assertEquals(retrievedUser.username(), testUser.username());
     }
 
     @Test
@@ -73,8 +73,7 @@ public abstract class UserDAOTest {
     public void isPasswordEqual() {
         userDAO.createUser(testUser);
         UserData retrievedUser = userDAO.getUser(testUser.username());
-        assertEquals(retrievedUser.email(), testUser.email());
-        assertEquals(retrievedUser.username(), testUser.username());
+
         assertTrue(userDAO.isPasswordEqual(testUser.password(), retrievedUser.password()));
     }
 
