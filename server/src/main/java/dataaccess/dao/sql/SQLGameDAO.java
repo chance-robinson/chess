@@ -1,11 +1,36 @@
 package dataaccess.dao.sql;
 
+import dataaccess.DataAccessException;
+import dataaccess.DatabaseManager;
 import dataaccess.dao.GameDAO;
 import model.GameData;
+import server.ServerException;
 
 import java.util.ArrayList;
 
 public class SQLGameDAO implements GameDAO {
+
+    public SQLGameDAO() throws ServerException {
+        try {
+            String[] createStatements = {
+                """
+                CREATE TABLE IF NOT EXISTS  gameData (
+                  `gameID` INT NOT NULL AUTO_INCREMENT,
+                  `whiteUsername` varchar(256),
+                  `blackUsername` varchar(256),
+                  `gameName` varchar(256) NOT NULL,
+                  PRIMARY KEY (`gameID`),
+                  json TEXT DEFAULT NULL
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+                """
+            };
+
+            DatabaseManager.configureDatabase(createStatements);
+        } catch (DataAccessException e) {
+            throw new ServerException("Error: database operation failed", 500);
+        }
+    }
+
     /**
      * Clears all game data
      */

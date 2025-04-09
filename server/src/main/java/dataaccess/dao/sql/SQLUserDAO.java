@@ -1,9 +1,33 @@
 package dataaccess.dao.sql;
 
+import dataaccess.DatabaseManager;
 import dataaccess.dao.UserDAO;
+import dataaccess.DataAccessException;
 import model.UserData;
+import server.ServerException;
 
 public class SQLUserDAO implements UserDAO {
+
+    public SQLUserDAO() throws ServerException {
+        try {
+            String[] createStatements = {
+                """
+                CREATE TABLE IF NOT EXISTS  userData (
+                  `username` varchar(256) NOT NULL,
+                  `password` varchar(256) NOT NULL,
+                  `email` varchar(256) NOT NULL,
+                  PRIMARY KEY (`username`),
+                  json TEXT DEFAULT NULL
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+                """
+            };
+
+            DatabaseManager.configureDatabase(createStatements);
+        } catch (DataAccessException e) {
+            throw new ServerException("Error: database operation failed", 500);
+        }
+    }
+
     /**
      * Clears all user data
      */

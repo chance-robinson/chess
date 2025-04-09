@@ -48,7 +48,7 @@ public class Server {
         AuthDAO authDAO;
         GameDAO gameDAO;
 
-        boolean useSQL = false;
+        boolean useSQL = true;
         if (useSQL) {
             userDAO = new SQLUserDAO();
             authDAO = new SQLAuthDAO();
