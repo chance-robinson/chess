@@ -5,6 +5,7 @@ import dataaccess.dao.GameDAO;
 import model.GameData;
 import server.ServerException;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class SQLGameDAO implements GameDAO {
@@ -45,10 +46,10 @@ public class SQLGameDAO implements GameDAO {
      */
     @Override
     public void createGame(GameData gameData) {
-        var statement = "INSERT INTO gameData(gameName, whiteUsername, " +
+        var statement = "INSERT INTO gameData(gameID, whiteUsername, " +
                 "blackUsername, gameName, game) VALUES (?, ?, ?, ?, ?)";
         try {
-            DatabaseManager.executeUpdate(statement, gameData.gameName(),
+            DatabaseManager.executeUpdate(statement, gameData.gameID(),
                     gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), gameData.game());
         } catch (ServerException e) {
             throw new RuntimeException("Unable to createGame", e);
@@ -73,7 +74,20 @@ public class SQLGameDAO implements GameDAO {
      */
     @Override
     public int generateGameID() {
-        return 0;
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT MAX(gameID) FROM gameData";
+            try (var ps = conn.prepareStatement(statement)) {
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return rs.getInt(1) + 1;
+                    } else {
+                        return 1;
+                    }
+                }
+            }
+        } catch (ServerException | SQLException e) {
+            throw new RuntimeException("Unable to generateGameID", e);
+        }
     }
 
     /**
