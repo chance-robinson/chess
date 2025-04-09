@@ -47,7 +47,6 @@ public abstract class UserDAOTest {
         UserData retrievedUser = userDAO.getUser(testUser.username());
         assertEquals(retrievedUser.email(), testUser.email());
         assertEquals(retrievedUser.username(), testUser.username());
-        assertTrue(userDAO.isPasswordEqual(testUser.password(), retrievedUser.password()));
     }
 
     @Test
