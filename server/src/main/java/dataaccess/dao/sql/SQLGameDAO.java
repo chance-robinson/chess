@@ -178,6 +178,12 @@ public class SQLGameDAO implements GameDAO {
      */
     @Override
     public void update(GameData gameData) {
-
+        var statement = "UPDATE gameData SET whiteUsername=?, " +
+                "blackUsername=?, game=? WHERE gameID=?";
+        try {
+            DatabaseManager.executeUpdate(statement, gameData.whiteUsername(), gameData.blackUsername(), gameData.game(), gameData.gameID());
+        } catch (ServerException e) {
+            throw new RuntimeException("Unable to update", e);
+        }
     }
 }
