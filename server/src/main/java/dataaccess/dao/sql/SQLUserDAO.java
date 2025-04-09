@@ -2,9 +2,11 @@ package dataaccess.dao.sql;
 
 import dataaccess.DatabaseManager;
 import dataaccess.dao.UserDAO;
-import dataaccess.DataAccessException;
 import model.UserData;
 import server.ServerException;
+
+import java.sql.SQLException;
+
 
 public class SQLUserDAO implements UserDAO {
 
@@ -29,7 +31,12 @@ public class SQLUserDAO implements UserDAO {
      */
     @Override
     public void clear() {
-
+        var statement = "TRUNCATE userData";
+        try {
+            DatabaseManager.executeUpdate(statement);
+        } catch (ServerException e) {
+            throw new RuntimeException("Unable to clear", e);
+        }
     }
 
     /**
@@ -39,7 +46,12 @@ public class SQLUserDAO implements UserDAO {
      */
     @Override
     public void createUser(UserData userData) {
-
+        var statement = "INSERT INTO userData(username, password, email) VALUES (?, ?, ?)";
+        try {
+            DatabaseManager.executeUpdate(statement, userData.username(), userData.password(), userData.password());
+        } catch (ServerException e) {
+            throw new RuntimeException("Unable to createUser", e);
+        }
     }
 
     /**
@@ -50,6 +62,21 @@ public class SQLUserDAO implements UserDAO {
      */
     @Override
     public UserData getUser(String username) {
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT * FROM userData WHERE username=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, username);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return new UserData(rs.getString("username"),
+                                rs.getString("password"),
+                                rs.getString("email"));
+                    }
+                }
+            }
+        } catch (ServerException | SQLException e) {
+            throw new RuntimeException("Unable to get user by username", e);
+        }
         return null;
     }
 
@@ -61,6 +88,21 @@ public class SQLUserDAO implements UserDAO {
      */
     @Override
     public UserData getUserByEmail(String email) {
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT * FROM userData WHERE username=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, email);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return new UserData(rs.getString("username"),
+                                rs.getString("password"),
+                                rs.getString("email"));
+                    }
+                }
+            }
+        } catch (ServerException | SQLException e) {
+            throw new RuntimeException("Unable to get user by email", e);
+        }
         return null;
     }
 }

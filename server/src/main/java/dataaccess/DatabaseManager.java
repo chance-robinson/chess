@@ -66,7 +66,7 @@ public class DatabaseManager {
      * }
      * </code>
      */
-    static Connection getConnection() throws ServerException {
+    public static Connection getConnection() throws ServerException {
         try {
             var conn = DriverManager.getConnection(CONNECTION_URL, USER, PASSWORD);
             conn.setCatalog(DATABASE_NAME);
@@ -89,7 +89,7 @@ public class DatabaseManager {
         }
     }
 
-    public static int executeUpdate(String statement, Object... params) throws ServerException {
+    public static void executeUpdate(String statement, Object... params) throws ServerException {
         try (var conn = getConnection()) {
             try (var ps = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)) {
                 for (var i = 0; i < params.length; i++) {
@@ -107,10 +107,9 @@ public class DatabaseManager {
 
                 var rs = ps.getGeneratedKeys();
                 if (rs.next()) {
-                    return rs.getInt(1);
+                    rs.getInt(1);
                 }
 
-                return 0;
             }
         } catch (SQLException e) {
             throw new ServerException(String.format("unable to update database: %s, %s", statement, e.getMessage()), 500);
