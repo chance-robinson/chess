@@ -66,26 +66,8 @@ public class SQLGameDAO implements GameDAO {
      */
     @Override
     public GameData getGame(int gameID) {
-        try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT * FROM gameData WHERE gameID=?";
-            try (var ps = conn.prepareStatement(statement)) {
-                ps.setInt(1, gameID);
-                try (var rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        return new GameData(
-                                rs.getInt("gameID"),
-                                rs.getString("whiteUsername"),
-                                rs.getString("blackUsername"),
-                                rs.getString("gameName"),
-                                new Gson().fromJson(rs.getString("game"), ChessGame.class)
-                        );
-                    }
-                }
-            }
-        } catch (ServerException | SQLException e) {
-            throw new RuntimeException("Unable to getGame", e);
-        }
-        return null;
+        String statement = "SELECT * FROM gameData WHERE gameID=?";
+        return getGameDataQuery(statement, gameID);
     }
 
     /**
@@ -147,26 +129,8 @@ public class SQLGameDAO implements GameDAO {
      */
     @Override
     public GameData getGameByGameName(String gameName) {
-        try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT * FROM gameData WHERE gameName=?";
-            try (var ps = conn.prepareStatement(statement)) {
-                ps.setString(1, gameName);
-                try (var rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        return new GameData(
-                                rs.getInt("gameID"),
-                                rs.getString("whiteUsername"),
-                                rs.getString("blackUsername"),
-                                rs.getString("gameName"),
-                                new Gson().fromJson(rs.getString("game"), ChessGame.class)
-                        );
-                    }
-                }
-            }
-        } catch (ServerException | SQLException e) {
-            throw new RuntimeException("Unable to getGameByGameName", e);
-        }
-        return null;
+        String statement = "SELECT * FROM gameData WHERE gameName=?";
+        return getGameDataQuery(statement, gameName);
     }
 
     /**
@@ -183,5 +147,31 @@ public class SQLGameDAO implements GameDAO {
         } catch (ServerException e) {
             throw new RuntimeException("Unable to update", e);
         }
+    }
+
+    private GameData getGameDataQuery(String query, Object param) {
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var ps = conn.prepareStatement(query)) {
+                if (param instanceof String) {
+                    ps.setString(1, (String) param);
+                } else if (param instanceof Integer) {
+                    ps.setInt(1, (Integer) param);
+                }
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return new GameData(
+                                rs.getInt("gameID"),
+                                rs.getString("whiteUsername"),
+                                rs.getString("blackUsername"),
+                                rs.getString("gameName"),
+                                new Gson().fromJson(rs.getString("game"), ChessGame.class)
+                        );
+                    }
+                }
+            }
+        } catch (ServerException | SQLException e) {
+            throw new RuntimeException("Unable to getGameDataQuery", e);
+        }
+        return null;
     }
 }
