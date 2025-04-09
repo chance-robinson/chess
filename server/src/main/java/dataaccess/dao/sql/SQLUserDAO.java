@@ -31,9 +31,8 @@ public class SQLUserDAO implements UserDAO {
      */
     @Override
     public void clear() {
-        var statement = "TRUNCATE userData";
         try {
-            DatabaseManager.executeUpdate(statement);
+            DatabaseManager.executeUpdate("TRUNCATE userData");
         } catch (ServerException e) {
             throw new RuntimeException("Unable to clear", e);
         }
