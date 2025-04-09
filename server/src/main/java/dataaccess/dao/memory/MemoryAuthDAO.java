@@ -27,6 +27,9 @@ public class MemoryAuthDAO implements AuthDAO {
      */
     @Override
     public void createAuth(String authToken, AuthData authData) {
+        if (auths.containsKey(authData.authToken())) {
+            throw new RuntimeException("authToken not unique");
+        }
         auths.put(authToken, authData);
     }
 
