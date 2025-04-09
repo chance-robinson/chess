@@ -1,4 +1,11 @@
 package dataaccess.dao.memory;
 
-public class MemoryUserDAOTest {
+import dataaccess.dao.UserDAO;
+import dataaccess.dao.UserDAOTest;
+
+public class MemoryUserDAOTest extends UserDAOTest {
+    @Override
+    protected UserDAO createUserDAO() {
+        return new MemoryUserDAO();
+    }
 }

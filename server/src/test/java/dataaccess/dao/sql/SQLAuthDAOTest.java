@@ -1,4 +1,11 @@
 package dataaccess.dao.sql;
 
-public class SQLAuthDAOTest {
+import dataaccess.dao.AuthDAO;
+import dataaccess.dao.AuthDAOTest;
+
+public class SQLAuthDAOTest extends AuthDAOTest {
+    @Override
+    protected AuthDAO createAuthDAO() {
+        return new SQLAuthDAO();
+    }
 }

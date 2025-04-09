@@ -1,4 +1,11 @@
 package dataaccess.dao.memory;
 
-public class MemoryGameDAOTest {
+import dataaccess.dao.GameDAO;
+import dataaccess.dao.GameDAOTest;
+
+public class MemoryGameDAOTest extends GameDAOTest {
+    @Override
+    protected GameDAO createGameDAO() {
+        return new MemoryGameDAO();
+    }
 }

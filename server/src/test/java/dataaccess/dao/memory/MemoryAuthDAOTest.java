@@ -1,4 +1,11 @@
 package dataaccess.dao.memory;
 
-public class MemoryAuthDAOTest {
+import dataaccess.dao.AuthDAO;
+import dataaccess.dao.AuthDAOTest;
+
+public class MemoryAuthDAOTest extends AuthDAOTest {
+    @Override
+    protected AuthDAO createAuthDAO() {
+        return new MemoryAuthDAO();
+    }
 }

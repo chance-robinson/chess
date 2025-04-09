@@ -1,4 +1,11 @@
 package dataaccess.dao.sql;
 
-public class SQLGameDAOTest {
+import dataaccess.dao.GameDAO;
+import dataaccess.dao.GameDAOTest;
+
+public class SQLGameDAOTest extends GameDAOTest {
+    @Override
+    protected GameDAO createGameDAO() {
+        return new SQLGameDAO();
+    }
 }
