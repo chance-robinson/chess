@@ -11,7 +11,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class SQLGameDAO implements GameDAO {
-
+    /**
+     * This constructor ensures that the gameData table is built on the
+     * chess database
+     *
+     * @throws ServerException if the database fails to configure
+     */
     public SQLGameDAO() throws ServerException {
         String[] createStatements = {
             """
@@ -30,7 +35,7 @@ public class SQLGameDAO implements GameDAO {
     }
 
     /**
-     * Clears all game data
+     * Clears all game data by truncating the table
      */
     @Override
     public void clear() {
@@ -42,7 +47,7 @@ public class SQLGameDAO implements GameDAO {
     }
 
     /**
-     * Creates a new game entry
+     * Creates a new game entry in gameData table
      *
      * @param gameData the game data to be created
      */
@@ -59,7 +64,7 @@ public class SQLGameDAO implements GameDAO {
     }
 
     /**
-     * Returns the game data for a given game ID
+     * Returns the game data for a given game ID from the gameData table
      *
      * @param gameID the game ID to retrieve
      * @return the game data for the given game ID
@@ -71,7 +76,8 @@ public class SQLGameDAO implements GameDAO {
     }
 
     /**
-     * Generates a unique game ID
+     * Generates a unique game ID based on the max gameID
+     * from the gameData table
      *
      * @return a new unique game ID
      */
@@ -94,7 +100,7 @@ public class SQLGameDAO implements GameDAO {
     }
 
     /**
-     * Returns a list of all games
+     * Returns a list of all games from the gameData table
      *
      * @return a list of all game data
      */
@@ -122,7 +128,7 @@ public class SQLGameDAO implements GameDAO {
     }
 
     /**
-     * Returns game data for a given game
+     * Returns game data for a given game from the gameData table
      *
      * @param gameName the game name to retrieve game data for
      * @return game data for the given game name
@@ -134,7 +140,7 @@ public class SQLGameDAO implements GameDAO {
     }
 
     /**
-     * Updates a game with new game data
+     * Updates a game with new game data from the gameData table
      *
      * @param gameData the new game data to be updated
      */
@@ -149,6 +155,14 @@ public class SQLGameDAO implements GameDAO {
         }
     }
 
+    /**
+     * Returns game data based on a template query and a param
+     * from the gameData table
+     *
+     * @param query a SQL query following the format "SELECT * FROM gameData WHERE ...=?"
+     * @param param a param specifying what we are equaling in the WHERE, i.e. gameName/gameID
+     * @return the gameData for the given query and param
+     */
     private GameData getGameDataQuery(String query, Object param) {
         try (var conn = DatabaseManager.getConnection()) {
             try (var ps = conn.prepareStatement(query)) {

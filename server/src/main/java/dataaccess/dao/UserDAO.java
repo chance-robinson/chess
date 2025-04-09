@@ -34,5 +34,12 @@ public interface UserDAO {
      */
     UserData getUserByEmail(String email);
 
+    /**
+     * Helper to return whether two passwords are equal
+     *
+     * @param password the password that we originally had and want to compare
+     * @param storedPassword the password we are comparing against ex. hashed
+     * @return true if they are equal, false if they aren't
+     */
     boolean isPasswordEqual(String password, String storedPassword);
 }

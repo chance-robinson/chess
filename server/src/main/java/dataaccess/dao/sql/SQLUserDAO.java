@@ -9,7 +9,12 @@ import java.sql.SQLException;
 
 
 public class SQLUserDAO implements UserDAO {
-
+    /**
+     * This constructor ensures that the userData table is built on the
+     * chess database
+     *
+     * @throws ServerException if the database fails to configure
+     */
     public SQLUserDAO() throws ServerException {
         String[] createStatements = {
             """
@@ -26,7 +31,7 @@ public class SQLUserDAO implements UserDAO {
     }
 
     /**
-     * Clears all user data
+     * Clears all user data by truncating the table
      */
     @Override
     public void clear() {
@@ -38,7 +43,7 @@ public class SQLUserDAO implements UserDAO {
     }
 
     /**
-     * Creates a new user data
+     * Creates a new user data row in userData table
      *
      * @param userData the user data to be created
      */
@@ -54,7 +59,7 @@ public class SQLUserDAO implements UserDAO {
     }
 
     /**
-     * Returns the user data for a given username
+     * Returns the user data for a given username from the userData table
      *
      * @param username the username to retrieve
      * @return the user data for the given username
@@ -80,7 +85,7 @@ public class SQLUserDAO implements UserDAO {
     }
 
     /**
-     * Returns the user data for a given email address
+     * Returns the user data for a given email address from the userData table
      *
      * @param email the email address to retrieve the user with
      * @return the user data for the given email address
@@ -105,6 +110,13 @@ public class SQLUserDAO implements UserDAO {
         return null;
     }
 
+    /**
+     * Helper to return whether two passwords are equal
+     *
+     * @param password the password that we originally had and want to compare
+     * @param storedPassword the password we are comparing against ex. hashed
+     * @return true if they are equal, false if they aren't
+     */
     @Override
     public boolean isPasswordEqual(String password, String storedPassword) {
         return BCrypt.checkpw(password, storedPassword);

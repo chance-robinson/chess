@@ -8,7 +8,12 @@ import server.ServerException;
 import java.sql.SQLException;
 
 public class SQLAuthDAO implements AuthDAO {
-
+    /**
+     * This constructor ensures that the authData table is built on the
+     * chess database
+     *
+     * @throws ServerException if the database fails to configure
+     */
     public SQLAuthDAO() throws ServerException {
         String[] createStatements = {
             """
@@ -24,7 +29,7 @@ public class SQLAuthDAO implements AuthDAO {
     }
 
     /**
-     * Clears all auth data
+     * Clears all auth data by truncating the table
      */
     @Override
     public void clear() {
@@ -36,7 +41,7 @@ public class SQLAuthDAO implements AuthDAO {
     }
 
     /**
-     * Creates a new authData
+     * Creates a new authData in authData table
      *
      * @param authToken the authToken to be assigned with authData
      * @param authData  the authData to be created with the authToken
@@ -52,7 +57,7 @@ public class SQLAuthDAO implements AuthDAO {
     }
 
     /**
-     * Returns an authData given an authToken
+     * Returns an authData given an authToken from the authData table
      *
      * @param authToken the authToken to retrieve
      * @return AuthData for the given authToken
@@ -77,7 +82,7 @@ public class SQLAuthDAO implements AuthDAO {
     }
 
     /**
-     * Deletes an authData given an authToken
+     * Deletes an authData given an authToken from the authData table
      *
      * @param authToken the authToken to delete
      */
