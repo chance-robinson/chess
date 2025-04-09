@@ -1,7 +1,10 @@
 package dataaccess.dao.sql;
 
+import chess.ChessGame;
+import com.google.gson.Gson;
 import dataaccess.DatabaseManager;
 import dataaccess.dao.GameDAO;
+import model.AuthData;
 import model.GameData;
 import server.ServerException;
 
@@ -97,7 +100,25 @@ public class SQLGameDAO implements GameDAO {
      */
     @Override
     public ArrayList<GameData> getAllGames() {
-        return null;
+        ArrayList<GameData> games = new ArrayList<>();
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT * FROM gameData";
+            try (var ps = conn.prepareStatement(statement)) {
+                var rs = ps.executeQuery();
+                while (rs.next()) {
+                    games.add(new GameData(
+                            rs.getInt("gameID"),
+                            rs.getString("whiteUsername"),
+                            rs.getString("blackUsername"),
+                            rs.getString("gameName"),
+                            new Gson().fromJson(rs.getString("game"), ChessGame.class)
+                    ));
+                }
+            }
+            return games;
+        } catch (ServerException | SQLException e) {
+            throw new RuntimeException("Unable to getAllGames", e);
+        }
     }
 
     /**
