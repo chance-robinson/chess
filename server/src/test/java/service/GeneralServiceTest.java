@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class GeneralServiceTest {
+public abstract class GeneralServiceTest {
     private UserDAO userDAO;
     private UserData testUser;
     private GameDAO gameDAO;
@@ -24,14 +24,18 @@ public class GeneralServiceTest {
     private AuthData testAuth;
     private GeneralService generalService;
 
+    protected abstract GameDAO createGameDAO();
+    protected abstract AuthDAO createAuthDAO();
+    protected abstract UserDAO createUserDAO();
+
     @BeforeEach
     public void initialize() {
-        gameDAO = new MemoryGameDAO();
-        authDAO = new MemoryAuthDAO();
-        userDAO = new MemoryUserDAO();
-        generalService = new GeneralService(userDAO, gameDAO, authDAO);
-        testAuth = new AuthData("testAuth", "testUser");
-        testUser = new UserData("testUser", "testPass", "test@example.com");
+        this.gameDAO = createGameDAO();
+        this.authDAO = createAuthDAO();
+        this.userDAO = createUserDAO();
+        this.generalService = new GeneralService(userDAO, gameDAO, authDAO);
+        this.testAuth = new AuthData("testAuth", "testUser");
+        this.testUser = new UserData("testUser", "testPass", "test@example.com");
     }
 
     @Test

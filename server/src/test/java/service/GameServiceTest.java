@@ -2,8 +2,6 @@ package service;
 
 import dataaccess.dao.AuthDAO;
 import dataaccess.dao.GameDAO;
-import dataaccess.dao.memory.MemoryAuthDAO;
-import dataaccess.dao.memory.MemoryGameDAO;
 import model.AuthData;
 import model.GameData;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,20 +14,23 @@ import server.net.result.ListGamesResult;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class GameServiceTest {
+public abstract class GameServiceTest {
     private GameDAO gameDAO;
     private AuthDAO authDAO;
     private GameService gameService;
     private AuthData testAuth;
     private AuthData testAuth2;
 
+    protected abstract GameDAO createGameDAO();
+    protected abstract AuthDAO createAuthDAO();
+
     @BeforeEach
     public void initialize() {
-        gameDAO = new MemoryGameDAO();
-        authDAO = new MemoryAuthDAO();
-        gameService = new GameService(gameDAO, authDAO);
-        testAuth = new AuthData("testAuth", "testUser");
-        testAuth2 = new AuthData("testAuth2", "testUser2");
+        this.gameDAO = createGameDAO();
+        this.authDAO = createAuthDAO();
+        this.gameService = new GameService(gameDAO, authDAO);
+        this.testAuth = new AuthData("testAuth", "testUser");
+        this.testAuth2 = new AuthData("testAuth2", "testUser2");
     }
 
     @Test
