@@ -10,7 +10,6 @@ import server.net.request.RegisterRequest;
 import server.net.result.LoginResult;
 import server.net.result.RegisterResult;
 
-import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -70,7 +69,7 @@ public class UserService {
         }
 
         UserData user = userDAO.getUser(username);
-        if (user == null || !Objects.equals(user.password(), password)) {
+        if (user == null || !userDAO.isPasswordEqual(password, user.password())) {
             throw new ServerException("Error: unauthorized", 401);
         }
 

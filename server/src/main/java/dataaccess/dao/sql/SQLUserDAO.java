@@ -48,7 +48,7 @@ public class SQLUserDAO implements UserDAO {
         var statement = "INSERT INTO userData(username, password, email) VALUES (?, ?, ?)";
         try {
             DatabaseManager.executeUpdate(statement, userData.username(),
-                    userData.password(), BCrypt.hashpw(userData.password(), BCrypt.gensalt()));
+                    BCrypt.hashpw(userData.password(), BCrypt.gensalt()), userData.email());
         } catch (ServerException e) {
             throw new RuntimeException("Unable to createUser", e);
         }
@@ -89,7 +89,7 @@ public class SQLUserDAO implements UserDAO {
     @Override
     public UserData getUserByEmail(String email) {
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT * FROM userData WHERE username=?";
+            var statement = "SELECT * FROM userData WHERE email=?";
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setString(1, email);
                 try (var rs = ps.executeQuery()) {
@@ -104,5 +104,10 @@ public class SQLUserDAO implements UserDAO {
             throw new RuntimeException("Unable to get user by email", e);
         }
         return null;
+    }
+
+    @Override
+    public boolean isPasswordEqual(String password, String storedPassword) {
+        return BCrypt.checkpw(password, storedPassword);
     }
 }

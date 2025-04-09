@@ -33,4 +33,6 @@ public interface UserDAO {
      * @return the user data for the given email address
      */
     UserData getUserByEmail(String email);
+
+    boolean isPasswordEqual(String password, String storedPassword);
 }

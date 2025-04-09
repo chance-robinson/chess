@@ -4,6 +4,7 @@ import dataaccess.dao.UserDAO;
 import model.UserData;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 /**
  * In-memory implementation of the UserDAO interface.
@@ -54,5 +55,10 @@ public class MemoryUserDAO implements UserDAO {
             }
         }
         return null;
+    }
+
+    @Override
+    public boolean isPasswordEqual(String password, String storedPassword) {
+        return Objects.equals(password, storedPassword);
     }
 }

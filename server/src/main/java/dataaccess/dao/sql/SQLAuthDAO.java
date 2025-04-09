@@ -85,7 +85,7 @@ public class SQLAuthDAO implements AuthDAO {
     @Override
     public void deleteAuth(String authToken) {
         try {
-            DatabaseManager.executeUpdate("DELETE FROM authData WHERE authToken=?");
+            DatabaseManager.executeUpdate("DELETE FROM authData WHERE authToken=?", authToken);
         } catch (ServerException e) {
             throw new RuntimeException("Unable to clear", e);
         }
