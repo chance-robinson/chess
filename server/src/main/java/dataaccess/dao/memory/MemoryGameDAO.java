@@ -29,6 +29,9 @@ public class MemoryGameDAO implements GameDAO {
      */
     @Override
     public void createGame(GameData gameData) {
+        if (games.containsKey(gameData.gameID())) {
+            throw new RuntimeException("gameID not unique");
+        }
         games.put(gameData.gameID(), gameData);
     }
 
@@ -86,6 +89,9 @@ public class MemoryGameDAO implements GameDAO {
      */
     @Override
     public void update(GameData gameData) {
+        if (!games.containsKey(gameData.gameID())) {
+            throw new RuntimeException("game to update doesn't exist");
+        }
         games.remove(gameData.gameID());
         games.put(gameData.gameID(), gameData);
     }

@@ -149,7 +149,12 @@ public class SQLGameDAO implements GameDAO {
         var statement = "UPDATE gameData SET whiteUsername=?, " +
                 "blackUsername=?, game=? WHERE gameID=?";
         try {
-            DatabaseManager.executeUpdate(statement, gameData.whiteUsername(), gameData.blackUsername(), gameData.game(), gameData.gameID());
+            GameData existingGame = getGame(gameData.gameID());
+            if (existingGame != null) {
+                DatabaseManager.executeUpdate(statement, gameData.whiteUsername(), gameData.blackUsername(), gameData.game(), gameData.gameID());
+            } else {
+                throw new ServerException("Error: bad request", 500);
+            }
         } catch (ServerException e) {
             throw new RuntimeException("Unable to update", e);
         }
