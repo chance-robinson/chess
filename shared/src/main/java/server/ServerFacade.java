@@ -2,6 +2,10 @@ package server;
 
 import com.google.gson.Gson;
 import exception.ResponseException;
+import server.net.request.LoginRequest;
+import server.net.request.RegisterRequest;
+import server.net.result.LoginResult;
+import server.net.result.RegisterResult;
 
 import java.io.*;
 import java.net.*;
@@ -17,6 +21,16 @@ public class ServerFacade {
     public void clear() throws ResponseException {
         var path = "/db";
         makeRequest("DELETE", path, null, null);
+    }
+
+    public RegisterResult register(RegisterRequest request) throws ResponseException {
+        var path = "/user";
+        return makeRequest("POST", path, request, RegisterResult.class);
+    }
+
+    public LoginResult login(LoginRequest request) throws ResponseException {
+        var path = "/session";
+        return makeRequest("POST", path, request, LoginResult.class);
     }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
