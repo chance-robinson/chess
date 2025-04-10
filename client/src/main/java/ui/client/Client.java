@@ -1,6 +1,6 @@
 package ui.client;
 
 public interface Client {
-    String eval(String input);
+    ClientResult eval(String input);
     String help();
 }

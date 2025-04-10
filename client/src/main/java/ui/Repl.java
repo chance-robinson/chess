@@ -26,7 +26,11 @@ public class Repl {
             String line = scanner.nextLine();
 
             try {
-                result = getCurrentClient().eval(line);
+                ClientResult clientResult = getCurrentClient().eval(line);
+                result = clientResult.result();
+                if (state != clientResult.updatedState()) {
+                    this.state = clientResult.updatedState();
+                }
             } catch (Throwable e) {
                 var msg = e.toString();
                 System.out.print(msg);
