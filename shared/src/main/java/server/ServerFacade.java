@@ -2,8 +2,10 @@ package server;
 
 import com.google.gson.Gson;
 import exception.ResponseException;
+import server.net.request.CreateGameRequest;
 import server.net.request.LoginRequest;
 import server.net.request.RegisterRequest;
+import server.net.result.CreateGameResult;
 import server.net.result.LoginResult;
 import server.net.result.RegisterResult;
 
@@ -20,25 +22,34 @@ public class ServerFacade {
 
     public void clear() throws ResponseException {
         var path = "/db";
-        makeRequest("DELETE", path, null, null);
+        makeRequest("DELETE", path, null, null, null);
     }
 
     public RegisterResult register(RegisterRequest request) throws ResponseException {
         var path = "/user";
-        return makeRequest("POST", path, request, RegisterResult.class);
+        return makeRequest("POST", path, request, RegisterResult.class, null);
     }
 
     public LoginResult login(LoginRequest request) throws ResponseException {
         var path = "/session";
-        return makeRequest("POST", path, request, LoginResult.class);
+        return makeRequest("POST", path, request, LoginResult.class, null);
     }
 
-    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
+    public CreateGameResult createGame(CreateGameRequest request, String authToken) throws ResponseException {
+        var path = "/game";
+        return makeRequest("POST", path, request, CreateGameResult.class, authToken);
+    }
+
+    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken) throws ResponseException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
+
+            if (authToken != null) {
+                http.setRequestProperty("Authorization", authToken);
+            }
 
             writeBody(request, http);
             http.connect();

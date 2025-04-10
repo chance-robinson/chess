@@ -5,8 +5,10 @@ import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
 import server.ServerFacade;
+import server.net.request.CreateGameRequest;
 import server.net.request.LoginRequest;
 import server.net.request.RegisterRequest;
+import server.net.result.CreateGameResult;
 import server.net.result.LoginResult;
 import server.net.result.RegisterResult;
 
@@ -67,6 +69,28 @@ public class ServerFacadeTests {
         LoginRequest loginRequest = new LoginRequest(testUser.username(), testUser.password());
 
         ResponseException exception = assertThrows(ResponseException.class, () -> serverFacade.login(loginRequest));
+        assertNotNull(exception);
+    }
+
+    @Test
+    public void createGame() throws ResponseException {
+        RegisterRequest registerRequest = new RegisterRequest(testUser.username(), testUser.password(), testUser.email());
+        serverFacade.register(registerRequest);
+
+        LoginRequest loginRequest = new LoginRequest(testUser.username(), testUser.password());
+        LoginResult loginResult = serverFacade.login(loginRequest);
+
+        CreateGameRequest createGameRequest = new CreateGameRequest("testGame");
+        CreateGameResult createGameResult = serverFacade.createGame(createGameRequest, loginResult.authToken());
+        assertNotNull(createGameResult);
+        assertEquals(createGameResult.gameID(), 1);
+    }
+
+    @Test
+    public void createGameBadAuthToken() {
+        CreateGameRequest createGameRequest = new CreateGameRequest("testGame");
+
+        ResponseException exception = assertThrows(ResponseException.class, () -> serverFacade.createGame(createGameRequest, "DNE"));
         assertNotNull(exception);
     }
 
