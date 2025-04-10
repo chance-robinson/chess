@@ -3,9 +3,11 @@ package server;
 import com.google.gson.Gson;
 import exception.ResponseException;
 import server.net.request.CreateGameRequest;
+import server.net.request.JoinGameRequest;
 import server.net.request.LoginRequest;
 import server.net.request.RegisterRequest;
 import server.net.result.CreateGameResult;
+import server.net.result.ListGamesResult;
 import server.net.result.LoginResult;
 import server.net.result.RegisterResult;
 
@@ -43,6 +45,16 @@ public class ServerFacade {
     public CreateGameResult createGame(CreateGameRequest request, String authToken) throws ResponseException {
         var path = "/game";
         return makeRequest("POST", path, request, CreateGameResult.class, authToken);
+    }
+
+    public void joinGame(JoinGameRequest request, String authToken) throws ResponseException {
+        var path = "/game";
+        makeRequest("PUT", path, request, null, authToken);
+    }
+
+    public ListGamesResult listGames(String authToken) throws ResponseException {
+        var path = "/game";
+        return makeRequest("GET", path, null, ListGamesResult.class, authToken);
     }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken) throws ResponseException {
