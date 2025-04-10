@@ -94,6 +94,24 @@ public class ServerFacadeTests {
         assertNotNull(exception);
     }
 
+    @Test
+    public void logout() throws ResponseException {
+        RegisterRequest registerRequest = new RegisterRequest(testUser.username(), testUser.password(), testUser.email());
+        RegisterResult registerResult = serverFacade.register(registerRequest);
+
+        serverFacade.logout(registerResult.authToken());
+
+        LoginRequest loginRequest = new LoginRequest(testUser.username(), testUser.password());
+        LoginResult loginResult = serverFacade.login(loginRequest);
+        assertNotNull(loginResult);
+    }
+
+    @Test
+    public void logoutNotLoggedIn()  {
+        ResponseException exception = assertThrows(ResponseException.class, () -> serverFacade.logout("DNE"));
+        assertNotNull(exception);
+    }
+
     @AfterAll
     static void stopServer() {
         server.stop();

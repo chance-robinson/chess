@@ -25,6 +25,11 @@ public class ServerFacade {
         makeRequest("DELETE", path, null, null, null);
     }
 
+    public void logout(String authToken) throws ResponseException {
+        var path = "/session";
+        makeRequest("DELETE", path, null, null, authToken);
+    }
+
     public RegisterResult register(RegisterRequest request) throws ResponseException {
         var path = "/user";
         return makeRequest("POST", path, request, RegisterResult.class, null);
