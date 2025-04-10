@@ -15,6 +15,7 @@ public class ResponseException extends Exception {
     this.statusCode = statusCode;
   }
 
+  // remove later if not used for code quality
   public String toJson() {
     return new Gson().toJson(Map.of("message", getMessage(), "status", statusCode));
   }
@@ -26,7 +27,8 @@ public class ResponseException extends Exception {
     return new ResponseException(status, message);
   }
 
-  public int StatusCode() {
+  // remove later if not used for code quality
+  public int statusCode() {
     return statusCode;
   }
 }
