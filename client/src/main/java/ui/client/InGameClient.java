@@ -52,8 +52,8 @@ public class InGameClient implements Client {
         this.authToken = token;
     }
 
-    public void setPlayerColor(String token) {
-        this.authToken = token;
+    public void setPlayerColor(String playerColor) {
+        this.playerColor = playerColor;
     }
 
     public String getPlayerColor() {

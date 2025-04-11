@@ -3,6 +3,7 @@ package ui;
 import ui.client.*;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -39,8 +40,8 @@ public class Repl {
                     loggedInClient.setAuthToken(clientResult.authToken());
                     inGameClient.setAuthToken(clientResult.authToken());
                 }
-                if ("join:WHITE".equals(result) || "join:BLACK".equals(result)) {
-                    inGameClient.setPlayerColor(result);
+                if ("join:black".equalsIgnoreCase(result)) {
+                    inGameClient.setPlayerColor("BLACK");
                 } else {
                     inGameClient.setPlayerColor("WHITE");
                 }
