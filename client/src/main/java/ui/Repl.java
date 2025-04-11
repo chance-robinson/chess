@@ -37,18 +37,18 @@ public class Repl {
                 result = clientResult.result();
                 if (clientResult.updatedState() != null && state != clientResult.updatedState()) {
                     state = clientResult.updatedState();
-                    loggedInClient.setAuthToken(clientResult.authToken());
-                    inGameClient.setAuthToken(clientResult.authToken());
+                    if (clientResult.updatedState() != ClientState.SIGNEDOUT && clientResult.authToken() != null) {
+                        authToken = clientResult.authToken();
+                    } else if (clientResult.updatedState() == ClientState.SIGNEDOUT) {
+                        authToken = null;
+                    }
+                    loggedInClient.setAuthToken(authToken);
+                    inGameClient.setAuthToken(authToken);
                 }
                 if ("join:black".equalsIgnoreCase(result)) {
                     inGameClient.setPlayerColor("BLACK");
                 } else {
                     inGameClient.setPlayerColor("WHITE");
-                }
-                if (state == ClientState.SIGNEDOUT) {
-                    authToken = null;
-                } else if (!Objects.equals(clientResult.authToken(), authToken) && authToken != null) {
-                    authToken = clientResult.authToken();
                 }
                 if (getCurrentClient() instanceof InGameClient && !List.of("help", "logout", "quit").contains(result)) {
                     ChessBoardUI.drawBoard(inGameClient.getPlayerColor());
