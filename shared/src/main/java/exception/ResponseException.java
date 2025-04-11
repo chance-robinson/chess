@@ -7,15 +7,16 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 
 public class ResponseException extends Exception {
+  static private int statusCode;
 
-  public ResponseException(int status, String message) {
+  public ResponseException(int statusCode, String message) {
     super(message);
+    ResponseException.statusCode = statusCode;
   }
 
   public static ResponseException fromJson(InputStream stream) {
     var map = new Gson().fromJson(new InputStreamReader(stream), HashMap.class);
-    var status = ((Double)map.get("status")).intValue();
     String message = map.get("message").toString();
-    return new ResponseException(status, message);
+    return new ResponseException(statusCode, message);
   }
 }
