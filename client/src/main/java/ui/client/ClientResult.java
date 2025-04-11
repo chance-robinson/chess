@@ -1,3 +1,3 @@
 package ui.client;
 
-public record ClientResult(String result, ClientState updatedState) { }
+public record ClientResult(String result, ClientState updatedState, String authToken) { }

@@ -7,11 +7,6 @@ public class LoggedInClient implements Client {
 
     @Override
     public ClientResult eval(String input) {
-        return new ClientResult("loggedInEval", null);
-    }
-
-    @Override
-    public ClientResult help() {
-        return new ClientResult("help", null);
+        return new ClientResult("loggedInEval", null, null);
     }
 }

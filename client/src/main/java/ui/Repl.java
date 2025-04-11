@@ -1,6 +1,8 @@
 package ui;
 
 import ui.client.*;
+
+import java.util.Objects;
 import java.util.Scanner;
 
 public class Repl {
@@ -8,6 +10,7 @@ public class Repl {
     private final LoggedInClient loggedInClient;
     private final InGameClient inGameClient;
     private ClientState state = ClientState.SIGNEDOUT;
+    private String authToken = null;
 
     public Repl(String serverUrl) {
         preLoginClient = new PreLoginClient(serverUrl);
@@ -17,7 +20,7 @@ public class Repl {
 
     public void run() {
         System.out.println("\uD83D\uDC36 Welcome to Chess. Log-in to start.");
-        System.out.print(preLoginClient.help());
+        preLoginClient.help();
 
         Scanner scanner = new Scanner(System.in);
         var result = "";
@@ -30,6 +33,11 @@ public class Repl {
                 result = clientResult.result();
                 if (clientResult.updatedState() != null && state != clientResult.updatedState()) {
                     state = clientResult.updatedState();
+                }
+                if (state == ClientState.SIGNEDOUT) {
+                    authToken = null;
+                } else if (!Objects.equals(clientResult.authToken(), authToken) && authToken != null) {
+                    authToken = clientResult.authToken();
                 }
             } catch (Throwable e) {
                 var msg = e.toString();
