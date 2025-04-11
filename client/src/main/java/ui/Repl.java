@@ -33,6 +33,8 @@ public class Repl {
                 result = clientResult.result();
                 if (clientResult.updatedState() != null && state != clientResult.updatedState()) {
                     state = clientResult.updatedState();
+                    loggedInClient.setAuthToken(clientResult.authToken());
+                    inGameClient.setAuthToken(clientResult.authToken());
                 }
                 if (state == ClientState.SIGNEDOUT) {
                     authToken = null;
@@ -44,7 +46,7 @@ public class Repl {
                 System.out.print(msg);
             }
         }
-        System.out.println();
+//        System.out.println();
     }
 
     private void printPrompt() {

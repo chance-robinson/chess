@@ -37,7 +37,7 @@ public class PreLoginClient implements Client {
                 quit - playing chess
                 help - with possible commands
                 """;
-        System.out.println(helpText);
+        System.out.print(helpText);
         return new ClientResult("help", null, null);
     }
 
@@ -48,8 +48,8 @@ public class PreLoginClient implements Client {
                 var password = params[1];
                 LoginRequest loginRequest = new LoginRequest(username, password);
                 LoginResult loginResult = serverFacade.login(loginRequest);
-                return new ClientResult(String.format("You have logged in as: %s",
-                        loginResult.username()), ClientState.SIGNEDIN, loginResult.authToken());
+                System.out.printf("You have logged in as: %s", loginResult.username());
+                return new ClientResult("login", ClientState.SIGNEDIN, loginResult.authToken());
             } catch (RuntimeException e) {
                 throw new RuntimeException(e);
             }
