@@ -93,16 +93,11 @@ public class GameService {
             throw new ServerException("Error: unauthorized", 401);
         }
 
-        if (gameId == 0) {
+        if (gameId == 0 || playerColor == null) {
             throw new ServerException("Error: bad request", 400);
         }
 
         GameData gameData = gameDAO.getGame(gameId);
-
-        if (playerColor == null) {
-            return;
-        }
-
         if (gameData == null) {
             throw new ServerException("Error: bad request", 400);
         }

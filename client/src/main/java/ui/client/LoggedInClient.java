@@ -29,7 +29,7 @@ public class LoggedInClient implements Client {
             case "create" -> createGame(params);
             case "list" -> listGames();
             case "join" -> joinGame(params);
-            case "observe" -> observe(params);
+//            case "observe" -> observe(params);
             case "logout" -> logout();
             default -> help();
         };
@@ -50,7 +50,7 @@ public class LoggedInClient implements Client {
                 var gameName = params[0];
                 CreateGameRequest createGameRequest = new CreateGameRequest(gameName);
                 CreateGameResult createGameResult = serverFacade.createGame(createGameRequest, authToken);
-                System.out.printf("Game created with ID: %d",createGameResult.gameID());
+                System.out.printf("Game created with ID: %d\n",createGameResult.gameID());
                 return new ClientResult("create", null, null);
             } catch (RuntimeException e) {
                 throw new RuntimeException(e);
@@ -78,6 +78,7 @@ public class LoggedInClient implements Client {
         }
     }
 
+    // not implemented yet
     public ClientResult observe(String... params) throws ResponseException {
         if (params.length == 1) {
             try {
@@ -117,7 +118,7 @@ public class LoggedInClient implements Client {
                 create <NAME> - a game
                 list - games
                 join <GameID> [WHITE|BLACK] - a game
-                observe <GameID> - a game
+                observe <GameID> - a game (not currently implemented)
                 logout - when you are done
                 help - with possible commands
                 """;
