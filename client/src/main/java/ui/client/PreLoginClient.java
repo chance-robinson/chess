@@ -55,7 +55,7 @@ public class PreLoginClient implements Client {
                 return new ClientResult("login", null, null);
             }
         } else {
-            System.out.println("Not enough arguments");
+            System.out.println("Arguments required: <USERNAME> <PASSWORD>");
             return new ClientResult("login", null, null);
         }
     }
@@ -70,11 +70,11 @@ public class PreLoginClient implements Client {
                 RegisterResult registerResult = serverFacade.register(registerRequest);
                 return new ClientResult("register", ClientState.SIGNEDIN, registerResult.authToken());
             } catch (ResponseException e) {
-                System.out.println("Bad response");
-                throw new RuntimeException(e);
+                System.out.printf("%s\n", e.getMessage());
+                return new ClientResult("register", null, null);
             }
         } else {
-            System.out.println("Arguments required");
+            System.out.println("Arguments required: <USERNAME> <PASSWORD> <EMAIL>");
             return new ClientResult("register", ClientState.SIGNEDOUT, null);
         }
     }
