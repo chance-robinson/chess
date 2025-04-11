@@ -33,6 +33,7 @@ public class Repl {
             try {
                 ClientResult clientResult = getCurrentClient().eval(line);
                 result = clientResult.result();
+
                 if (clientResult.updatedState() != null && state != clientResult.updatedState()) {
                     state = clientResult.updatedState();
                     if (clientResult.updatedState() != ClientState.SIGNEDOUT && clientResult.authToken() != null) {

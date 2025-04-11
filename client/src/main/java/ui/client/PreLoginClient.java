@@ -51,12 +51,11 @@ public class PreLoginClient implements Client {
                 System.out.printf("You have logged in as: %s\n", loginResult.username());
                 return new ClientResult("login", ClientState.SIGNEDIN, loginResult.authToken());
             } catch (ResponseException e) {
-                System.out.printf("%s\n", e.getMessage());
-                return new ClientResult("login", null, null);
+                return handleError(e);
             }
         } else {
             System.out.println("Arguments required: <USERNAME> <PASSWORD>");
-            return new ClientResult("login", null, null);
+            return new ClientResult("error", null, null);
         }
     }
 
@@ -70,12 +69,11 @@ public class PreLoginClient implements Client {
                 RegisterResult registerResult = serverFacade.register(registerRequest);
                 return new ClientResult("register", ClientState.SIGNEDIN, registerResult.authToken());
             } catch (ResponseException e) {
-                System.out.printf("%s\n", e.getMessage());
-                return new ClientResult("register", null, null);
+                return handleError(e);
             }
         } else {
             System.out.println("Arguments required: <USERNAME> <PASSWORD> <EMAIL>");
-            return new ClientResult("register", ClientState.SIGNEDOUT, null);
+            return new ClientResult("error", null, null);
         }
     }
 }

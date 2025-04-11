@@ -17,7 +17,7 @@ public class InGameClient implements Client {
     }
 
     @Override
-    public ClientResult eval(String input) throws ResponseException {
+    public ClientResult eval(String input) {
         var tokens = input.toLowerCase().split(" ");
         var cmd = (tokens.length > 0) ? tokens[0] : "help";
         var params = Arrays.copyOfRange(tokens, 1, tokens.length);
@@ -28,12 +28,12 @@ public class InGameClient implements Client {
         };
     }
 
-    public ClientResult logout() throws ResponseException {
+    public ClientResult logout() {
         try {
             serverFacade.logout(authToken);
             return new ClientResult("logout", ClientState.SIGNEDOUT, null);
-        } catch (RuntimeException e) {
-            throw new RuntimeException(e);
+        } catch (ResponseException e) {
+            return handleError(e);
         }
     }
 

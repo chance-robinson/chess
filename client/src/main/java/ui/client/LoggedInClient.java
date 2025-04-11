@@ -21,7 +21,7 @@ public class LoggedInClient implements Client {
     }
 
     @Override
-    public ClientResult eval(String input) throws ResponseException {
+    public ClientResult eval(String input) {
         var tokens = input.toLowerCase().split(" ");
         var cmd = (tokens.length > 0) ? tokens[0] : "help";
         var params = Arrays.copyOfRange(tokens, 1, tokens.length);
@@ -35,16 +35,16 @@ public class LoggedInClient implements Client {
         };
     }
 
-    public ClientResult logout() throws ResponseException {
+    public ClientResult logout() {
         try {
             serverFacade.logout(authToken);
             return new ClientResult("logout", ClientState.SIGNEDOUT, null);
-        } catch (RuntimeException e) {
-            throw new RuntimeException(e);
+        } catch (ResponseException e) {
+            return handleError(e);
         }
     }
 
-    public ClientResult createGame(String... params) throws ResponseException {
+    public ClientResult createGame(String... params) {
         if (params.length == 1) {
             try {
                 var gameName = params[0];
@@ -52,16 +52,16 @@ public class LoggedInClient implements Client {
                 CreateGameResult createGameResult = serverFacade.createGame(createGameRequest, authToken);
                 System.out.printf("Game created with ID: %d\n",createGameResult.gameID());
                 return new ClientResult("create", null, null);
-            } catch (RuntimeException e) {
-                throw new RuntimeException(e);
+            } catch (ResponseException e) {
+                return handleError(e);
             }
         } else {
-            System.out.println("Not enough arguments");
-            return new ClientResult("create", null, null);
+            System.out.println("Arguments required: <GameName>");
+            return new ClientResult("error", null, null);
         }
     }
 
-    public ClientResult joinGame(String... params) throws ResponseException {
+    public ClientResult joinGame(String... params) {
         if (params.length == 2) {
             try {
                 var gameID = Integer.parseInt(params[0]);
@@ -69,25 +69,25 @@ public class LoggedInClient implements Client {
                 JoinGameRequest joinGameRequest = new JoinGameRequest(playerColor, gameID);
                 serverFacade.joinGame(joinGameRequest, authToken);
                 return new ClientResult(String.format("join:%s",playerColor), ClientState.INGAME, null);
-            } catch (RuntimeException e) {
-                throw new RuntimeException(e);
+            } catch (ResponseException e) {
+                return handleError(e);
             }
         } else {
-            System.out.println("Not enough arguments");
-            return new ClientResult("join", null, null);
+            System.out.println("Arguments required: <GameID> [WHITE|BLACK]");
+            return new ClientResult("error", null, null);
         }
     }
 
     // not implemented yet
-    public ClientResult observe(String... params) throws ResponseException {
+    public ClientResult observe(String... params) {
         if (params.length == 1) {
             try {
                 var gameID = Integer.parseInt(params[0]);
                 JoinGameRequest joinGameRequest = new JoinGameRequest(null, gameID);
                 serverFacade.joinGame(joinGameRequest, authToken);
                 return new ClientResult("observe", ClientState.OBSERVER, null);
-            } catch (RuntimeException e) {
-                throw new RuntimeException(e);
+            } catch (ResponseException e) {
+                return handleError(e);
             }
         } else {
             System.out.println("Not enough arguments");
@@ -95,7 +95,7 @@ public class LoggedInClient implements Client {
         }
     }
 
-    public ClientResult listGames() throws ResponseException {
+    public ClientResult listGames() {
         try {
             ListGamesResult listGamesResult = serverFacade.listGames(authToken);
             ArrayList<GameData> games = listGamesResult.games();
@@ -107,8 +107,8 @@ public class LoggedInClient implements Client {
             }
             System.out.print(gamesListString);
             return new ClientResult("listGames", null, null);
-        } catch (RuntimeException e) {
-            throw new RuntimeException(e);
+        } catch (ResponseException e) {
+            return handleError(e);
         }
     }
 
