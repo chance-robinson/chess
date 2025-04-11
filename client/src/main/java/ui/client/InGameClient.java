@@ -1,16 +1,16 @@
 package ui.client;
 
-public class InGameClient implements Client {
-    public InGameClient(String serverUrl) {
+import server.ServerFacade;
 
+public class InGameClient implements Client {
+    private static ServerFacade serverFacade;
+
+    public InGameClient(String serverUrl) {
+        serverFacade = new ServerFacade(serverUrl);
     }
 
     @Override
     public ClientResult eval(String input) {
         return new ClientResult("inGameEval", null, null);
-    }
-
-    public ClientResult help() {
-        return new ClientResult("help", null, null);
     }
 }

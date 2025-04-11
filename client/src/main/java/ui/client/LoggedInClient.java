@@ -1,8 +1,12 @@
 package ui.client;
 
-public class LoggedInClient implements Client {
-    public LoggedInClient(String serverUrl) {
+import server.ServerFacade;
 
+public class LoggedInClient implements Client {
+    private static ServerFacade serverFacade;
+
+    public LoggedInClient(String serverUrl) {
+        serverFacade = new ServerFacade(serverUrl);
     }
 
     @Override
