@@ -22,6 +22,7 @@ public class InGameClient implements Client {
         var cmd = (tokens.length > 0) ? tokens[0] : "help";
         var params = Arrays.copyOfRange(tokens, 1, tokens.length);
         return switch (cmd) {
+            case "draw" -> new ClientResult("draw", null, null);
             case "logout" -> logout();
             case "quit" -> new ClientResult("quit", ClientState.SIGNEDOUT, null);
             default -> help();
@@ -40,11 +41,12 @@ public class InGameClient implements Client {
     public ClientResult help() {
         String helpText =
                 """
+                draw - redraws chess board
                 logout - when you are done
                 quit - playing chess
                 help - with possible commands
                 """;
-        System.out.println(helpText);
+        System.out.print(helpText);
         return new ClientResult("help", null, null);
     }
 
@@ -54,5 +56,9 @@ public class InGameClient implements Client {
 
     public void setPlayerColor(String token) {
         this.authToken = token;
+    }
+
+    public String getPlayerColor() {
+        return playerColor;
     }
 }

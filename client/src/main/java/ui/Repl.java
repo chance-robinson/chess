@@ -2,6 +2,7 @@ package ui;
 
 import ui.client.*;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -46,16 +47,18 @@ public class Repl {
                 } else if (!Objects.equals(clientResult.authToken(), authToken) && authToken != null) {
                     authToken = clientResult.authToken();
                 }
+                if (getCurrentClient() instanceof InGameClient && !List.of("help", "logout", "quit").contains(result)) {
+                    ChessBoardUI.drawBoard(inGameClient.getPlayerColor());
+                }
             } catch (Throwable e) {
                 var msg = e.toString();
                 System.out.print(msg);
             }
         }
-//        System.out.println();
     }
 
     private void printPrompt() {
-        System.out.print("\n" + getStateUiDescriptor());
+        System.out.print(getStateUiDescriptor());
     }
 
     private Client getCurrentClient() {

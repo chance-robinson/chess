@@ -123,7 +123,7 @@ public class LoggedInClient implements Client {
                 quit - playing chess
                 help - with possible commands
                 """;
-        System.out.println(helpText);
+        System.out.print(helpText);
         return new ClientResult("help", null, null);
     }
 
