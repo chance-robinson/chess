@@ -28,8 +28,8 @@ public class Repl {
             try {
                 ClientResult clientResult = getCurrentClient().eval(line);
                 result = clientResult.result();
-                if (state != clientResult.updatedState()) {
-                    this.state = clientResult.updatedState();
+                if (clientResult.updatedState() != null && state != clientResult.updatedState()) {
+                    state = clientResult.updatedState();
                 }
             } catch (Throwable e) {
                 var msg = e.toString();

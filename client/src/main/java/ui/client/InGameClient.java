@@ -6,12 +6,12 @@ public class InGameClient implements Client {
     }
 
     @Override
-    public String eval(String input) {
-        return "";
+    public ClientResult eval(String input) {
+        return new ClientResult("inGameEval", null);
     }
 
     @Override
-    public String help() {
-        return "";
+    public ClientResult help() {
+        return new ClientResult("help", null);
     }
 }
