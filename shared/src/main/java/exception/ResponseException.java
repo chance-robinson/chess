@@ -5,19 +5,11 @@ import com.google.gson.Gson;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
-import java.util.Map;
 
 public class ResponseException extends Exception {
-  final private int statusCode;
 
-  public ResponseException(int statusCode, String message) {
+  public ResponseException(int status, String message) {
     super(message);
-    this.statusCode = statusCode;
-  }
-
-  // remove later if not used for code quality
-  public String toJson() {
-    return new Gson().toJson(Map.of("message", getMessage(), "status", statusCode));
   }
 
   public static ResponseException fromJson(InputStream stream) {
@@ -25,10 +17,5 @@ public class ResponseException extends Exception {
     var status = ((Double)map.get("status")).intValue();
     String message = map.get("message").toString();
     return new ResponseException(status, message);
-  }
-
-  // remove later if not used for code quality
-  public int statusCode() {
-    return statusCode;
   }
 }
