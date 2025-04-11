@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import static ui.EscapeSequences.*;
+
 public class LoggedInClient implements Client {
     private static ServerFacade serverFacade;
     private String authToken = null;
@@ -50,7 +52,7 @@ public class LoggedInClient implements Client {
                 var gameName = params[0];
                 CreateGameRequest createGameRequest = new CreateGameRequest(gameName);
                 CreateGameResult createGameResult = serverFacade.createGame(createGameRequest, authToken);
-                System.out.printf("Game created with ID: %d\n",createGameResult.gameID());
+                System.out.printf("    " + SET_TEXT_COLOR_BLUE + "Game created with GameID: " + RESET_TEXT_COLOR + "%d\n",createGameResult.gameID());
                 return new ClientResult("create", null, null);
             } catch (ResponseException e) {
                 return handleError(e);
@@ -100,11 +102,7 @@ public class LoggedInClient implements Client {
             ListGamesResult listGamesResult = serverFacade.listGames(authToken);
             ArrayList<GameData> games = listGamesResult.games();
             games.sort(Comparator.comparingInt(GameData::gameID));
-            StringBuilder gamesListString = new StringBuilder();
-            for (GameData game: games) {
-                gamesListString.append(String.format("GameID: %d, GameName: %s, White: %s, Black: %s\n",
-                        game.gameID(), game.gameName(), game.whiteUsername(), game.blackUsername()));
-            }
+            StringBuilder gamesListString = listGameStringBuilder(games);
             System.out.print(gamesListString);
             return new ClientResult("listGames", null, null);
         } catch (ResponseException e) {
@@ -112,16 +110,27 @@ public class LoggedInClient implements Client {
         }
     }
 
+    private static StringBuilder listGameStringBuilder(ArrayList<GameData> games) {
+        StringBuilder gamesListString = new StringBuilder();
+        for (GameData game: games) {
+            gamesListString.append(String.format(
+                    "    " + SET_TEXT_COLOR_BLUE + "GameID" + RESET_TEXT_COLOR + ": %d " +
+                            SET_TEXT_COLOR_BLUE + "GameName" + RESET_TEXT_COLOR + ": %s " +
+                            SET_TEXT_COLOR_BLUE + "White" + RESET_TEXT_COLOR + ": %s " +
+                            SET_TEXT_COLOR_BLUE + "Black" + RESET_TEXT_COLOR + ": %s\n",
+                    game.gameID(), game.gameName(), game.whiteUsername(), game.blackUsername()));
+        }
+        return gamesListString;
+    }
+
     public ClientResult help() {
         String helpText =
-                """
-                create <NAME> - a game
-                list - games
-                join <GameID> [WHITE|BLACK] - a game
-                observe <GameID> - a game (not currently implemented)
-                logout - when you are done
-                help - with possible commands
-                """;
+            "    " + SET_TEXT_COLOR_BLUE + "create <NAME>" + RESET_TEXT_COLOR + " - a game\n" +
+            "    " + SET_TEXT_COLOR_BLUE + "list" + RESET_TEXT_COLOR + " - games\n" +
+            "    " + SET_TEXT_COLOR_BLUE + "join <GameID> [WHITE|BLACK]" + RESET_TEXT_COLOR + " - a game\n" +
+            "    " + SET_TEXT_COLOR_RED + "observe <GameID>" + RESET_TEXT_COLOR + " - a game (not currently implemented)\n" +
+            "    " + SET_TEXT_COLOR_BLUE + "logout" + RESET_TEXT_COLOR + " - when you are done\n" +
+            "    " + SET_TEXT_COLOR_BLUE + "help" + RESET_TEXT_COLOR + " - with possible commands\n";
         System.out.print(helpText);
         return new ClientResult("help", null, null);
     }

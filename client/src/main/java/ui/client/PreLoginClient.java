@@ -9,6 +9,8 @@ import server.net.result.RegisterResult;
 
 import java.util.Arrays;
 
+import static ui.EscapeSequences.*;
+
 public class PreLoginClient implements Client {
     private static ServerFacade serverFacade;
 
@@ -31,12 +33,10 @@ public class PreLoginClient implements Client {
 
     public ClientResult help() {
         String helpText =
-                """
-                register <USERNAME> <PASSWORD> <EMAIL> - to create an account
-                login <USERNAME> <PASSWORD> - to play chess
-                quit - playing chess
-                help - with possible commands
-                """;
+            "    " + SET_TEXT_COLOR_BLUE + "register <USERNAME> <PASSWORD> <EMAIL>" + RESET_TEXT_COLOR + " - to create an account\n" +
+            "    " + SET_TEXT_COLOR_BLUE + "login <USERNAME> <PASSWORD>" + RESET_TEXT_COLOR + " - to play chess\n" +
+            "    " + SET_TEXT_COLOR_BLUE + "quit" + RESET_TEXT_COLOR + " - playing chess\n" +
+            "    " + SET_TEXT_COLOR_BLUE + "help" + RESET_TEXT_COLOR + " - with possible commands\n";
         System.out.print(helpText);
         return new ClientResult("help", null, null);
     }
@@ -48,7 +48,7 @@ public class PreLoginClient implements Client {
                 var password = params[1];
                 LoginRequest loginRequest = new LoginRequest(username, password);
                 LoginResult loginResult = serverFacade.login(loginRequest);
-                System.out.printf("You have logged in as: %s\n", loginResult.username());
+                System.out.printf("    " + SET_TEXT_COLOR_BLUE + "You have logged in as: " + RESET_TEXT_COLOR + "%s\n", loginResult.username());
                 return new ClientResult("login", ClientState.SIGNEDIN, loginResult.authToken());
             } catch (ResponseException e) {
                 return handleError(e);

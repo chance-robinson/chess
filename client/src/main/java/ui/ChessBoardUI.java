@@ -18,8 +18,6 @@ public class ChessBoardUI {
 
     public static void drawBoard(String playerColor) {
         isWhite = !playerColor.equals("BLACK");
-        System.out.printf("Viewing: %s", playerColor);
-        System.out.println();
         int[] rowOrder = isWhite ? new int[]{8,7,6,5,4,3,2,1} : new int[]{1,2,3,4,5,6,7,8};
         int[] colOrder = isWhite ? new int[]{1,2,3,4,5,6,7,8} : new int[]{8,7,6,5,4,3,2,1};
         char[] colNames = new char[]{'a','b','c','d','e','f','g','h'};

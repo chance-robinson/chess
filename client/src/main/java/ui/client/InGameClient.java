@@ -6,6 +6,8 @@ import server.ServerFacade;
 
 import java.util.Arrays;
 
+import static ui.EscapeSequences.*;
+
 public class InGameClient implements Client {
     private static ServerFacade serverFacade;
     private String authToken;
@@ -39,11 +41,9 @@ public class InGameClient implements Client {
 
     public ClientResult help() {
         String helpText =
-                """
-                draw - redraws chess board
-                logout - when you are done
-                help - with possible commands
-                """;
+            "    " + SET_TEXT_COLOR_BLUE + "draw" + RESET_TEXT_COLOR + " - redraws chess board\n" +
+            "    " + SET_TEXT_COLOR_BLUE + "logout" + RESET_TEXT_COLOR + " - when you are done\n" +
+            "    " + SET_TEXT_COLOR_BLUE + "help" + RESET_TEXT_COLOR + " - with possible commands\n";
         System.out.print(helpText);
         return new ClientResult("help", null, null);
     }
