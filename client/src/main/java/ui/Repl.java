@@ -36,6 +36,11 @@ public class Repl {
                     loggedInClient.setAuthToken(clientResult.authToken());
                     inGameClient.setAuthToken(clientResult.authToken());
                 }
+                if ("join:WHITE".equals(result) || "join:BLACK".equals(result)) {
+                    inGameClient.setPlayerColor(result);
+                } else {
+                    inGameClient.setPlayerColor("WHITE");
+                }
                 if (state == ClientState.SIGNEDOUT) {
                     authToken = null;
                 } else if (!Objects.equals(clientResult.authToken(), authToken) && authToken != null) {
@@ -57,7 +62,7 @@ public class Repl {
         return switch (state) {
             case SIGNEDOUT -> preLoginClient;
             case SIGNEDIN ->  loggedInClient;
-            case INGAME -> inGameClient;
+            case INGAME, OBSERVER -> inGameClient;
         };
     }
 
@@ -66,6 +71,7 @@ public class Repl {
             case SIGNEDOUT -> "[LOGGED_OUT] >>> ";
             case SIGNEDIN ->  "[LOGGED_IN] >>> ";
             case INGAME -> "[CHESS_GAME] >>> ";
+            case OBSERVER -> "[OBSERVER] >>> ";
         };
     }
 }

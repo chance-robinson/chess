@@ -69,7 +69,7 @@ public class LoggedInClient implements Client {
                 var playerColor = params[1].toUpperCase();
                 JoinGameRequest joinGameRequest = new JoinGameRequest(playerColor, gameID);
                 serverFacade.joinGame(joinGameRequest, authToken);
-                return new ClientResult("join", ClientState.INGAME, null);
+                return new ClientResult(String.format("join:%s",playerColor), ClientState.INGAME, null);
             } catch (RuntimeException e) {
                 throw new RuntimeException(e);
             }
@@ -85,7 +85,7 @@ public class LoggedInClient implements Client {
                 var gameID = Integer.parseInt(params[0]);
                 JoinGameRequest joinGameRequest = new JoinGameRequest(null, gameID);
                 serverFacade.joinGame(joinGameRequest, authToken);
-                return new ClientResult("observe", ClientState.INGAME, null);
+                return new ClientResult("observe", ClientState.OBSERVER, null);
             } catch (RuntimeException e) {
                 throw new RuntimeException(e);
             }

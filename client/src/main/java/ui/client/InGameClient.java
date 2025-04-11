@@ -5,6 +5,7 @@ import server.ServerFacade;
 public class InGameClient implements Client {
     private static ServerFacade serverFacade;
     private String authToken;
+    private String playerColor = "WHITE";
 
     public InGameClient(String serverUrl) {
         serverFacade = new ServerFacade(serverUrl);
@@ -16,6 +17,10 @@ public class InGameClient implements Client {
     }
 
     public void setAuthToken(String token) {
+        this.authToken = token;
+    }
+
+    public void setPlayerColor(String token) {
         this.authToken = token;
     }
 }
