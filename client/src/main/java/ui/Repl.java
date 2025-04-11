@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
 
+import static java.lang.System.exit;
+
 public class Repl {
     private final PreLoginClient preLoginClient;
     private final LoggedInClient loggedInClient;
@@ -20,7 +22,7 @@ public class Repl {
     }
 
     public void run() {
-        System.out.println("\uD83D\uDC36 Welcome to Chess. Log-in to start.");
+        System.out.println("Welcome to Chess. Log-in to start.");
         preLoginClient.help();
 
         Scanner scanner = new Scanner(System.in);
@@ -55,6 +57,7 @@ public class Repl {
                 System.out.print(msg);
             }
         }
+        exit(0);
     }
 
     private void printPrompt() {

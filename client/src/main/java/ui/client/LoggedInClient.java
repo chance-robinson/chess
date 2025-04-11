@@ -31,7 +31,6 @@ public class LoggedInClient implements Client {
             case "join" -> joinGame(params);
             case "observe" -> observe(params);
             case "logout" -> logout();
-            case "quit" -> new ClientResult("quit", ClientState.SIGNEDOUT, null);
             default -> help();
         };
     }
@@ -120,7 +119,6 @@ public class LoggedInClient implements Client {
                 join <GameID> [WHITE|BLACK] - a game
                 observe <GameID> - a game
                 logout - when you are done
-                quit - playing chess
                 help - with possible commands
                 """;
         System.out.print(helpText);

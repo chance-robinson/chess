@@ -24,7 +24,6 @@ public class InGameClient implements Client {
         return switch (cmd) {
             case "draw" -> new ClientResult("draw", null, null);
             case "logout" -> logout();
-            case "quit" -> new ClientResult("quit", ClientState.SIGNEDOUT, null);
             default -> help();
         };
     }
@@ -43,7 +42,6 @@ public class InGameClient implements Client {
                 """
                 draw - redraws chess board
                 logout - when you are done
-                quit - playing chess
                 help - with possible commands
                 """;
         System.out.print(helpText);
