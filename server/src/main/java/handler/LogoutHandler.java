@@ -26,7 +26,7 @@ public class LogoutHandler implements Route {
      * @throws ServerException on errors
      */
     @Override
-    public Object handle(Request req, Response res) throws ServerException {
+    public Object handle(Request req, Response res) {
         try {
             String authToken = req.headers("Authorization");
 
@@ -36,7 +36,7 @@ public class LogoutHandler implements Route {
             return "";
         } catch (ServerException e) {
             res.status(e.getStatusCode());
-            return new Gson().toJson(new HandlerError(e.getMessage()));
+            return e.toHandlerGson();
         }
     }
 }

@@ -28,7 +28,7 @@ public class LoginHandler implements Route {
      * @throws ServerException on errors
      */
     @Override
-    public Object handle(Request req, Response res) throws ServerException {
+    public Object handle(Request req, Response res) {
         try {
             LoginRequest loginRequest = new Gson().fromJson(req.body(), LoginRequest.class);
             LoginResult loginResult = userService.login(loginRequest);
@@ -37,7 +37,7 @@ public class LoginHandler implements Route {
             return new Gson().toJson(loginResult);
         } catch (ServerException e) {
             res.status(e.getStatusCode());
-            return new Gson().toJson(new HandlerError(e.getMessage()));
+            return e.toHandlerGson();
         }
     }
 }

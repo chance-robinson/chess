@@ -3,8 +3,6 @@ package ui;
 import ui.client.*;
 
 import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
 import java.util.Scanner;
 
 import static java.lang.System.exit;

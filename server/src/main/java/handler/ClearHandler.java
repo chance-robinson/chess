@@ -25,13 +25,13 @@ public class ClearHandler implements Route {
      * @throws ServerException on errors
      */
     @Override
-    public Object handle(Request req, Response res) throws ServerException {
+    public Object handle(Request req, Response res) {
         try {
             generalService.clear();
             res.status(200);
             return "{}";
-        } catch (Exception e) {
-            throw new ServerException("Error: clear failed");
+        } catch (ServerException e) {
+            return e.toHandlerGson();
         }
     }
 }

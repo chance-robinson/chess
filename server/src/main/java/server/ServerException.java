@@ -1,5 +1,10 @@
 package server;
 
+import com.google.gson.Gson;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Basic Exception specifically for Server messages and status codes
  */
@@ -23,5 +28,13 @@ public class ServerException extends RuntimeException {
      */
     public int getStatusCode() {
         return statusCode;
+    }
+
+    public String toHandlerGson() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", getMessage());
+        response.put("status", getStatusCode());
+
+        return new Gson().toJson(response);
     }
 }

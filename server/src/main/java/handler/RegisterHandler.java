@@ -28,7 +28,7 @@ public class RegisterHandler implements Route {
      * @throws ServerException on errors
      */
     @Override
-    public Object handle(Request req, Response res) throws ServerException {
+    public Object handle(Request req, Response res) {
         try {
             RegisterRequest registerRequest = new Gson().fromJson(req.body(), RegisterRequest.class);
             RegisterResult registerResult = userService.register(registerRequest);
@@ -37,7 +37,7 @@ public class RegisterHandler implements Route {
             return new Gson().toJson(registerResult);
         } catch (ServerException e) {
             res.status(e.getStatusCode());
-            return new Gson().toJson(new HandlerError(e.getMessage()));
+            return e.toHandlerGson();
         }
     }
 }

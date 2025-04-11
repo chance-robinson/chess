@@ -17,7 +17,7 @@ public class PreLoginClient implements Client {
     }
 
     @Override
-    public ClientResult eval(String input) throws ResponseException {
+    public ClientResult eval(String input) {
         var tokens = input.toLowerCase().split(" ");
         var cmd = (tokens.length > 0) ? tokens[0] : "help";
         var params = Arrays.copyOfRange(tokens, 1, tokens.length);
@@ -41,7 +41,7 @@ public class PreLoginClient implements Client {
         return new ClientResult("help", null, null);
     }
 
-    public ClientResult login(String... params) throws ResponseException {
+    public ClientResult login(String... params)  {
         if (params.length == 2) {
             try {
                 var username = params[0];
@@ -50,8 +50,9 @@ public class PreLoginClient implements Client {
                 LoginResult loginResult = serverFacade.login(loginRequest);
                 System.out.printf("You have logged in as: %s\n", loginResult.username());
                 return new ClientResult("login", ClientState.SIGNEDIN, loginResult.authToken());
-            } catch (RuntimeException e) {
-                throw new RuntimeException(e);
+            } catch (ResponseException e) {
+                System.out.printf("%s\n", e.getMessage());
+                return new ClientResult("login", null, null);
             }
         } else {
             System.out.println("Not enough arguments");
@@ -68,12 +69,12 @@ public class PreLoginClient implements Client {
                 RegisterRequest registerRequest = new RegisterRequest(username, password, email);
                 RegisterResult registerResult = serverFacade.register(registerRequest);
                 return new ClientResult("register", ClientState.SIGNEDIN, registerResult.authToken());
-            } catch (RuntimeException | ResponseException e) {
+            } catch (ResponseException e) {
                 System.out.println("Bad response");
                 throw new RuntimeException(e);
             }
         } else {
-            System.out.println("Not enough arguments");
+            System.out.println("Arguments required");
             return new ClientResult("register", ClientState.SIGNEDOUT, null);
         }
     }
