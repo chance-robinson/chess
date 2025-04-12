@@ -5,7 +5,6 @@ import model.GameData;
 import serverfacade.ServerFacade;
 import server.net.request.CreateGameRequest;
 import server.net.request.JoinGameRequest;
-import server.net.result.CreateGameResult;
 import server.net.result.ListGamesResult;
 
 import java.util.ArrayList;
@@ -21,6 +20,7 @@ import static ui.EscapeSequences.*;
 public class LoggedInClient implements Client {
     private static ServerFacade serverFacade;
     private String authToken = null;
+    private ArrayList<GameData> listGames = new ArrayList<>();
 
     /**
      * The constructor for the PreLoginClient, which sets up a connection to the server.
@@ -80,14 +80,15 @@ public class LoggedInClient implements Client {
             try {
                 var gameName = params[0];
                 CreateGameRequest createGameRequest = new CreateGameRequest(gameName);
-                CreateGameResult createGameResult = serverFacade.createGame(createGameRequest, authToken);
-                System.out.printf("    " + SET_TEXT_COLOR_BLUE + "Game created with GameID: " + RESET_TEXT_COLOR + "%d\n",createGameResult.gameID());
+                serverFacade.createGame(createGameRequest, authToken);
+                System.out.printf("    " + SET_TEXT_COLOR_GREEN + "Game successfully created with GameName: "
+                        + RESET_TEXT_COLOR + "%s\n", createGameRequest.gameName());
                 return new ClientResult("create", null, null);
             } catch (ResponseException e) {
                 return handleError(e);
             }
         } else {
-            System.out.println("Arguments required: <GameName>");
+            System.out.println(SET_TEXT_COLOR_YELLOW + "    " + "Arguments required: create <GameName>" + RESET_TEXT_COLOR);
             return new ClientResult("error", null, null);
         }
     }
@@ -103,16 +104,24 @@ public class LoggedInClient implements Client {
     public ClientResult joinGame(String... params) {
         if (params.length == 2) {
             try {
-                var gameID = Integer.parseInt(params[0]);
+                var gameID = listGames.get(Integer.parseInt(params[0])-1).gameID();
                 var playerColor = params[1].toUpperCase();
+                if (!playerColor.equals("WHITE") && !playerColor.equals("BLACK")) {
+                    System.out.printf(SET_TEXT_COLOR_YELLOW + "    Error: Must select [WHITE|BLACK]\n" + RESET_TEXT_COLOR);
+                    return new ClientResult("error", null, null);
+                }
                 JoinGameRequest joinGameRequest = new JoinGameRequest(playerColor, gameID);
                 serverFacade.joinGame(joinGameRequest, authToken);
                 return new ClientResult(String.format("join:%s",playerColor), ClientState.INGAME, null);
-            } catch (ResponseException e) {
+            } catch (NumberFormatException | IndexOutOfBoundsException e) {
+                System.out.printf(SET_TEXT_COLOR_YELLOW + "    Error: <ID> must be of type Integer, greater than 0, " +
+                        "and must be in the list of games.\n" + RESET_TEXT_COLOR);
+                return new ClientResult("error", null, null);
+            }  catch (ResponseException e) {
                 return handleError(e);
             }
         } else {
-            System.out.println("Arguments required: <GameID> [WHITE|BLACK]");
+            System.out.println(SET_TEXT_COLOR_YELLOW + "    " + "Arguments required: join <ID> [WHITE|BLACK]" + RESET_TEXT_COLOR);
             return new ClientResult("error", null, null);
         }
     }
@@ -128,15 +137,19 @@ public class LoggedInClient implements Client {
     public ClientResult observe(String... params) {
         if (params.length == 1) {
             try {
-                var gameID = Integer.parseInt(params[0]);
+                var gameID = listGames.get(Integer.parseInt(params[0])-1).gameID();
                 JoinGameRequest joinGameRequest = new JoinGameRequest("observe", gameID);
                 serverFacade.joinGame(joinGameRequest, authToken);
                 return new ClientResult("observe", ClientState.OBSERVER, null);
+            } catch (NumberFormatException | IndexOutOfBoundsException e) {
+                System.out.printf(SET_TEXT_COLOR_YELLOW + "    " + "Error: <ID> must be of type Integer, greater than 0, " +
+                        "and must be in the list of games.\n" + RESET_TEXT_COLOR);
+                return new ClientResult("error", null, null);
             } catch (ResponseException e) {
                 return handleError(e);
             }
         } else {
-            System.out.println("Arguments required: <GameID> [WHITE|BLACK]");
+            System.out.println(SET_TEXT_COLOR_YELLOW + "    " + "Arguments required: observe <ID>" + RESET_TEXT_COLOR);
             return new ClientResult("error", null, null);
         }
     }
@@ -152,6 +165,7 @@ public class LoggedInClient implements Client {
             ListGamesResult listGamesResult = serverFacade.listGames(authToken);
             ArrayList<GameData> games = listGamesResult.games();
             games.sort(Comparator.comparingInt(GameData::gameID));
+            listGames = games;
             StringBuilder gamesListString = listGameStringBuilder(games);
             System.out.print(gamesListString);
             return new ClientResult("listGames", null, null);
@@ -169,13 +183,22 @@ public class LoggedInClient implements Client {
      */
     private static StringBuilder listGameStringBuilder(ArrayList<GameData> games) {
         StringBuilder gamesListString = new StringBuilder();
-        for (GameData game: games) {
+
+        if (games.isEmpty()) {
+            gamesListString.append(String.format("    " + SET_TEXT_COLOR_BLUE + "No games have been created.\n"
+            + RESET_TEXT_COLOR));
+            return gamesListString;
+        }
+
+        for (int i = 0; i < games.size(); i++) {
+            GameData game = games.get(i);
+            String whiteUsername = game.whiteUsername() != null ? game.whiteUsername() : "<JOIN-ABLE>";
+            String blackUsername = game.whiteUsername() != null ? game.whiteUsername() : "<JOIN-ABLE>";
             gamesListString.append(String.format(
-                    "    " + SET_TEXT_COLOR_BLUE + "GameID" + RESET_TEXT_COLOR + ": %d " +
-                            SET_TEXT_COLOR_BLUE + "GameName" + RESET_TEXT_COLOR + ": %s " +
+                    "    " + SET_TEXT_COLOR_BLUE + "%d GameName" + RESET_TEXT_COLOR + ": %s " +
                             SET_TEXT_COLOR_BLUE + "White" + RESET_TEXT_COLOR + ": %s " +
                             SET_TEXT_COLOR_BLUE + "Black" + RESET_TEXT_COLOR + ": %s\n",
-                    game.gameID(), game.gameName(), game.whiteUsername(), game.blackUsername()));
+                    i + 1, game.gameName(), whiteUsername, blackUsername));
         }
         return gamesListString;
     }
@@ -188,9 +211,10 @@ public class LoggedInClient implements Client {
     public ClientResult help() {
         String helpText =
             "    " + SET_TEXT_COLOR_BLUE + "create <NAME>" + RESET_TEXT_COLOR + " - a game\n" +
-            "    " + SET_TEXT_COLOR_BLUE + "list" + RESET_TEXT_COLOR + " - games\n" +
-            "    " + SET_TEXT_COLOR_BLUE + "join <GameID> [WHITE|BLACK]" + RESET_TEXT_COLOR + " - a game\n" +
-            "    " + SET_TEXT_COLOR_BLUE + "observe <GameID>" + RESET_TEXT_COLOR + " - a game to observe\n" +
+            "    " + SET_TEXT_COLOR_BLUE + "list" + RESET_TEXT_COLOR + " - games in format \"<ID> <GameName> " +
+                    "<WhiteUsername> <BlackUsername>\"\n" +
+            "    " + SET_TEXT_COLOR_BLUE + "join <ID> [WHITE|BLACK]" + RESET_TEXT_COLOR + " - a game\n" +
+            "    " + SET_TEXT_COLOR_BLUE + "observe <ID>" + RESET_TEXT_COLOR + " - a game to observe\n" +
             "    " + SET_TEXT_COLOR_BLUE + "logout" + RESET_TEXT_COLOR + " - when you are done\n" +
             "    " + SET_TEXT_COLOR_BLUE + "help" + RESET_TEXT_COLOR + " - with possible commands\n";
         System.out.print(helpText);

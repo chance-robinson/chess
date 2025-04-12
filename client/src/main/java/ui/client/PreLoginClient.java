@@ -76,13 +76,13 @@ public class PreLoginClient implements Client {
                 var password = params[1];
                 LoginRequest loginRequest = new LoginRequest(username, password);
                 LoginResult loginResult = serverFacade.login(loginRequest);
-                System.out.printf("    " + SET_TEXT_COLOR_BLUE + "You have logged in as: " + RESET_TEXT_COLOR + "%s\n", loginResult.username());
+                System.out.printf("    " + SET_TEXT_COLOR_GREEN + "You have logged in as: " + RESET_TEXT_COLOR + "%s\n", loginResult.username());
                 return new ClientResult("login", ClientState.SIGNEDIN, loginResult.authToken());
             } catch (ResponseException e) {
                 return handleError(e);
             }
         } else {
-            System.out.println("Arguments required: <USERNAME> <PASSWORD>");
+            System.out.println(SET_TEXT_COLOR_YELLOW + "    " + "Arguments required: login <USERNAME> <PASSWORD>" + RESET_TEXT_COLOR);
             return new ClientResult("error", null, null);
         }
     }
@@ -107,7 +107,8 @@ public class PreLoginClient implements Client {
                 return handleError(e);
             }
         } else {
-            System.out.println("Arguments required: <USERNAME> <PASSWORD> <EMAIL>");
+            System.out.println(SET_TEXT_COLOR_YELLOW + "    " + "Arguments required: register <USERNAME> <PASSWORD> <EMAIL>"
+                    + RESET_TEXT_COLOR);
             return new ClientResult("error", null, null);
         }
     }

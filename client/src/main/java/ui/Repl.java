@@ -7,7 +7,7 @@ import java.util.Objects;
 import java.util.Scanner;
 
 import static java.lang.System.exit;
-
+import static ui.EscapeSequences.*;
 /**
  * The Read,Eval,Print,Loop class that handlers all the user states and interactions
  * between the 3 specific clients: PreLogin, LoggedIn, and InGame, as well as all the
@@ -71,8 +71,7 @@ public class Repl {
                     }
                 }
             } catch (Throwable e) {
-                var msg = e.toString();
-                System.out.print(msg);
+                System.out.printf(SET_TEXT_COLOR_RED + "    Error has occurred with the previous command.\n" + RESET_TEXT_COLOR);
             }
         }
         exit(0);

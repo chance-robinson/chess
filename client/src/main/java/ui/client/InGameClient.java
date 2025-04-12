@@ -41,7 +41,7 @@ public class InGameClient implements Client {
         var cmd = (tokens.length > 0) ? tokens[0] : "help";
         var params = Arrays.copyOfRange(tokens, 1, tokens.length);
         return switch (cmd) {
-            case "draw" -> new ClientResult("draw", null, null);
+            case "redraw" -> new ClientResult("redraw", null, null);
             case "logout" -> logout();
             default -> help();
         };
@@ -69,7 +69,7 @@ public class InGameClient implements Client {
      */
     public ClientResult help() {
         String helpText =
-            "    " + SET_TEXT_COLOR_BLUE + "draw" + RESET_TEXT_COLOR + " - redraws chess board\n" +
+            "    " + SET_TEXT_COLOR_BLUE + "redraw" + RESET_TEXT_COLOR + " - redraws chess board\n" +
             "    " + SET_TEXT_COLOR_BLUE + "logout" + RESET_TEXT_COLOR + " - when you are done\n" +
             "    " + SET_TEXT_COLOR_BLUE + "help" + RESET_TEXT_COLOR + " - with possible commands\n";
         System.out.print(helpText);
