@@ -14,14 +14,30 @@ import java.util.Comparator;
 
 import static ui.EscapeSequences.*;
 
+/**
+ * The LoggedInClient handles all the logic for when a user has launched the client and
+ * has been logged in but not currently in a chess game.
+ */
 public class LoggedInClient implements Client {
     private static ServerFacade serverFacade;
     private String authToken = null;
 
+    /**
+     * The constructor for the PreLoginClient, which sets up a connection to the server.
+     *
+     * @param serverUrl the specific server url
+     */
     public LoggedInClient(String serverUrl) {
         serverFacade = new ServerFacade(serverUrl);
     }
 
+    /**
+     * Evaluates a specific input string as a command.
+     *
+     * @param input the command to evaluate on
+     * @return a ClientResult response containing the result value, the new ClientState (if any),
+     * and the authToken if received by a response result.
+     */
     @Override
     public ClientResult eval(String input) {
         var tokens = input.toLowerCase().split(" ");
@@ -36,6 +52,12 @@ public class LoggedInClient implements Client {
         };
     }
 
+    /**
+     * Attempts to log out a user based on their authToken
+     *
+     * @return a generic ClientResult response indicating if the logout
+     * was successful or not
+     */
     public ClientResult logout() {
         try {
             serverFacade.logout(authToken);
@@ -45,6 +67,13 @@ public class LoggedInClient implements Client {
         }
     }
 
+    /**
+     * Attempts to create a game given a gameName and returns the GameID.
+     *
+     * @param params the list of user parameters a user may have entered
+     * @return a ClientResult response containing the result value, the new ClientState (if any),
+     *  and the authToken if received by a response result.
+     */
     public ClientResult createGame(String... params) {
         if (params.length == 1) {
             try {
@@ -62,6 +91,14 @@ public class LoggedInClient implements Client {
         }
     }
 
+    /**
+     * Attempts to join a game based on the GameID and on the playerColor
+     * that the user has specified.
+     *
+     * @param params the list of user parameters a user may have entered
+     * @return a ClientResult response containing the result value, the new ClientState (if any),
+     *  and the authToken if received by a response result.
+     */
     public ClientResult joinGame(String... params) {
         if (params.length == 2) {
             try {
@@ -79,6 +116,12 @@ public class LoggedInClient implements Client {
         }
     }
 
+    /**
+     * Attempts to retrieve the list of games from the server, sorts them from
+     * lowest GameID to highest, and prints them out.
+     *
+     * @return a generic ClientResult response indicating nothing has changed
+     */
     public ClientResult listGames() {
         try {
             ListGamesResult listGamesResult = serverFacade.listGames(authToken);
@@ -92,6 +135,13 @@ public class LoggedInClient implements Client {
         }
     }
 
+    /**
+     * A method for building the gamesListString in listGames with
+     * specific formatting.
+     *
+     * @param games an ArrayList of GameData
+     * @return a constructed StringBuilder string of all the games
+     */
     private static StringBuilder listGameStringBuilder(ArrayList<GameData> games) {
         StringBuilder gamesListString = new StringBuilder();
         for (GameData game: games) {
@@ -105,6 +155,11 @@ public class LoggedInClient implements Client {
         return gamesListString;
     }
 
+    /**
+     * For displaying all the types of commands that can be run in the eval loop.
+     *
+     * @return a generic ClientResult response indicating nothing has changed
+     */
     public ClientResult help() {
         String helpText =
             "    " + SET_TEXT_COLOR_BLUE + "create <NAME>" + RESET_TEXT_COLOR + " - a game\n" +
@@ -117,6 +172,11 @@ public class LoggedInClient implements Client {
         return new ClientResult("help", null, null);
     }
 
+    /**
+     * Sets the authToken on the LoggedInClient to be used in the client requests.
+     *
+     * @param token the authToken
+     */
     public void setAuthToken(String token) {
         this.authToken = token;
     }

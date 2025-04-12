@@ -17,6 +17,10 @@ import spark.*;
 
 import static spark.Spark.*;
 
+/**
+ * The Server which we run our routes off of using Spark to initialize and create
+ * based on a specific port and location of staticFiles.
+ */
 public class Server {
 
     /**

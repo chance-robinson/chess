@@ -11,13 +11,29 @@ import java.util.Arrays;
 
 import static ui.EscapeSequences.*;
 
+/**
+ * The PreLoginClient handles all the logic for when a user has launched the client and
+ * hasn't logged in yet.
+ */
 public class PreLoginClient implements Client {
     private static ServerFacade serverFacade;
 
+    /**
+     * The constructor for the PreLoginClient, which sets up a connection to the server.
+     *
+     * @param serverUrl the specific server url
+     */
     public PreLoginClient(String serverUrl) {
         serverFacade = new ServerFacade(serverUrl);
     }
 
+    /**
+     * Evaluates a specific input string as a command.
+     *
+     * @param input the command to evaluate on
+     * @return a ClientResult response containing the result value, the new ClientState (if any),
+     * and the authToken if received by a response result.
+     */
     @Override
     public ClientResult eval(String input) {
         var tokens = input.toLowerCase().split(" ");
@@ -31,6 +47,11 @@ public class PreLoginClient implements Client {
         };
     }
 
+    /**
+     * For displaying all the types of commands that can be run in the eval loop.
+     *
+     * @return a generic ClientResult response indicating nothing has changed
+     */
     public ClientResult help() {
         String helpText =
             "    " + SET_TEXT_COLOR_BLUE + "register <USERNAME> <PASSWORD> <EMAIL>" + RESET_TEXT_COLOR + " - to create an account\n" +
@@ -41,6 +62,13 @@ public class PreLoginClient implements Client {
         return new ClientResult("help", null, null);
     }
 
+    /**
+     * Attempts to log in a user give the params.
+     *
+     * @param params the list of user parameters a user may have entered
+     * @return a ClientResult response containing the result value, the new ClientState (if any),
+     *  and the authToken if received by a response result.
+     */
     public ClientResult login(String... params)  {
         if (params.length == 2) {
             try {
@@ -59,6 +87,13 @@ public class PreLoginClient implements Client {
         }
     }
 
+    /**
+     * Attempts to register a user given the params.
+     *
+     * @param params the list of user parameters a user may have entered
+     * @return a ClientResult response containing the result value, the new ClientState (if any),
+     * and the authToken if received by a response result.
+     */
     public ClientResult register(String... params) {
         if (params.length == 3) {
             try {

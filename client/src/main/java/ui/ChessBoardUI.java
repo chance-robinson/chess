@@ -2,9 +2,10 @@ package ui;
 
 import static ui.EscapeSequences.*;
 
+/**
+ *  Temporary class for drawing the ChessBoardUI based on a given playerColor perspective.
+ */
 public class ChessBoardUI {
-    private static boolean isWhite = true;
-
     private static final char[][] DEFAULT_BOARD  = {
         {'R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'},
         {'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'},
@@ -16,8 +17,13 @@ public class ChessBoardUI {
         {'r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'}
     };
 
+    /**
+     * Renders the chessBoard based on the playerColor perspective.
+     *
+     * @param playerColor the playerColor to base render off of.
+     */
     public static void drawBoard(String playerColor) {
-        isWhite = !playerColor.equals("BLACK");
+        boolean isWhite = !playerColor.equals("BLACK");
         int[] rowOrder = isWhite ? new int[]{8,7,6,5,4,3,2,1} : new int[]{1,2,3,4,5,6,7,8};
         int[] colOrder = isWhite ? new int[]{1,2,3,4,5,6,7,8} : new int[]{8,7,6,5,4,3,2,1};
         char[] colNames = new char[]{'a','b','c','d','e','f','g','h'};
@@ -48,6 +54,13 @@ public class ChessBoardUI {
         System.out.println("   " + RESET_BG_COLOR + RESET_TEXT_COLOR);
     }
 
+    /**
+     * To determine what color is a piece based on whether it's black (lowercase)
+     * or white (uppercase).
+     *
+     * @param piece the piece char
+     * @return the formatted string based on the piece
+     */
     private static String getPieceColor(char piece) {
         if (piece == ' ') {
             return RESET_TEXT_COLOR + " ";

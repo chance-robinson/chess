@@ -14,49 +14,115 @@ import server.net.result.RegisterResult;
 import java.io.*;
 import java.net.*;
 
+/**
+ * ServerFacade for interfacing with the backend over HTTP.
+ */
 public class ServerFacade {
-
     private final String serverUrl;
 
+    /**
+     * Constructor for ServerFacade on a specific url
+     *
+     * @param url the url of the backend server including port
+     */
     public ServerFacade(String url) {
         serverUrl = url;
     }
 
+    /**
+     * Clears the database: userData, authData, gameData
+     *
+     * @throws ResponseException if the request fails or server has an error
+     */
     public void clear() throws ResponseException {
         var path = "/db";
         makeRequest("DELETE", path, null, null, null);
     }
 
+    /**
+     * Logout a user by removing the authToken from authData database.
+     *
+     * @param authToken the authToken
+     * @throws ResponseException if the request fails or server has an error
+     */
     public void logout(String authToken) throws ResponseException {
         var path = "/session";
         makeRequest("DELETE", path, null, null, authToken);
     }
 
+    /**
+     * Register a new user on the server and return authData.
+     *
+     * @param request the RegisterRequest including username, password, email
+     * @return the RegisterResult including authToken
+     * @throws ResponseException if the request fails or server has an error
+     */
     public RegisterResult register(RegisterRequest request) throws ResponseException {
         var path = "/user";
         return makeRequest("POST", path, request, RegisterResult.class, null);
     }
 
+    /**
+     * Login a user on the authData database.
+     *
+     * @param request the LoginRequest with username and password
+     * @return the LoginResult with authToken
+     * @throws ResponseException if the request fails or server has an error
+     */
     public LoginResult login(LoginRequest request) throws ResponseException {
         var path = "/session";
         return makeRequest("POST", path, request, LoginResult.class, null);
     }
 
+    /**
+     * Creates a game on the database and returns the gameID.
+     *
+     * @param request the CreateGameRequest with GameName
+     * @param authToken the authToken
+     * @return the CreateGameResult containing the GameID
+     * @throws ResponseException if the request fails or server has an error
+     */
     public CreateGameResult createGame(CreateGameRequest request, String authToken) throws ResponseException {
         var path = "/game";
         return makeRequest("POST", path, request, CreateGameResult.class, authToken);
     }
 
+    /**
+     * Join a specified game and update the database.
+     *
+     * @param  request the JoinGameRequest with GameID and playerColor
+     * @param authToken the authToken
+     * @throws ResponseException if the request fails or server has an error
+     */
     public void joinGame(JoinGameRequest request, String authToken) throws ResponseException {
         var path = "/game";
         makeRequest("PUT", path, request, null, authToken);
     }
 
+    /**
+     * Gets the list of games from the server.
+     *
+     * @param authToken the authToken
+     * @return a ListGamesResult of the list of games
+     * @throws ResponseException if the request fails or server has an error
+     */
     public ListGamesResult listGames(String authToken) throws ResponseException {
         var path = "/game";
         return makeRequest("GET", path, null, ListGamesResult.class, authToken);
     }
 
+    /**
+     * Sends the HTTP request to the server and returns the response.
+     *
+     * @param method the HTTP method
+     * @param path the request path
+     * @param request the request body
+     * @param responseClass the class for the response
+     * @param authToken the authToken
+     * @param <T> the type of response class
+     * @return the response object or empty
+     * @throws ResponseException if the request fails or server has an error
+     */
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken) throws ResponseException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
@@ -79,7 +145,13 @@ public class ServerFacade {
         }
     }
 
-
+    /**
+     * Writes the body to Json and writes it to reqBody.
+     *
+     * @param request the request object
+     * @param http the http connection
+     * @throws IOException if writing to reqBody fails
+     */
     private static void writeBody(Object request, HttpURLConnection http) throws IOException {
         if (request != null) {
             http.addRequestProperty("Content-Type", "application/json");
@@ -90,6 +162,14 @@ public class ServerFacade {
         }
     }
 
+    /**
+     * If the status code was not a successful request then
+     * throw an exception
+     *
+     * @param http the http connection
+     * @throws IOException if reading the error stream fails
+     * @throws ResponseException if the request fails or server has an error
+     */
     private void throwIfNotSuccessful(HttpURLConnection http) throws IOException, ResponseException {
         var status = http.getResponseCode();
         if (!isSuccessful(status)) {
@@ -103,6 +183,17 @@ public class ServerFacade {
         }
     }
 
+    /**
+     * To read the server response body, parse it into Gson,
+     * and then return it as a response object of the given
+     * response class type.
+     *
+     * @param http the http connection
+     * @param responseClass the class of the response body
+     * @param <T> the type of the response body
+     * @return the response object in Gson
+     * @throws IOException if reading the reqBody fails
+     */
     private static <T> T readBody(HttpURLConnection http, Class<T> responseClass) throws IOException {
         T response = null;
         if (http.getContentLength() < 0) {
@@ -117,6 +208,12 @@ public class ServerFacade {
     }
 
 
+    /**
+     * To decide if a HTTP response is successful or not.
+     *
+     * @param status corresponding to the HTTP response status code
+     * @return true if it's in the 200 status code, else false
+     */
     private boolean isSuccessful(int status) {
         return status / 100 == 2;
     }
