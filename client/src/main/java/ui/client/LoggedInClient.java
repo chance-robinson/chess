@@ -31,7 +31,6 @@ public class LoggedInClient implements Client {
             case "create" -> createGame(params);
             case "list" -> listGames();
             case "join" -> joinGame(params);
-//            case "observe" -> observe(params);
             case "logout" -> logout();
             default -> help();
         };
@@ -79,23 +78,6 @@ public class LoggedInClient implements Client {
             return new ClientResult("error", null, null);
         }
     }
-
-    // not implemented yet
-    //    public ClientResult observe(String... params) {
-    //        if (params.length == 1) {
-    //            try {
-    //                var gameID = Integer.parseInt(params[0]);
-    //                JoinGameRequest joinGameRequest = new JoinGameRequest(null, gameID);
-    //                serverFacade.joinGame(joinGameRequest, authToken);
-    //                return new ClientResult("observe", ClientState.OBSERVER, null);
-    //            } catch (ResponseException e) {
-    //                return handleError(e);
-    //            }
-    //        } else {
-    //            System.out.println("Not enough arguments");
-    //            return new ClientResult("observe", null, null);
-    //        }
-    //    }
 
     public ClientResult listGames() {
         try {

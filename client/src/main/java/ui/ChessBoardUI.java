@@ -5,7 +5,7 @@ import static ui.EscapeSequences.*;
 public class ChessBoardUI {
     private static boolean isWhite = true;
 
-    private static final char[][] defaultBoard = {
+    private static final char[][] DEFAULT_BOARD  = {
         {'R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'},
         {'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'},
         {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
@@ -31,7 +31,7 @@ public class ChessBoardUI {
         for (int row: rowOrder) {
             System.out.print(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_YELLOW + " " + row + " " + RESET_BG_COLOR + RESET_TEXT_COLOR);
             for (int col: colOrder) {
-                char piece = defaultBoard[row-1][col-1];
+                char piece = DEFAULT_BOARD[row-1][col-1];
                 String pieceColor = getPieceColor(piece);
 
                 boolean alternate = (row + col) % 2 == 0;
