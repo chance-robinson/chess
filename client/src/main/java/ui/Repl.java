@@ -3,6 +3,7 @@ package ui;
 import ui.client.*;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
 
 import static java.lang.System.exit;
@@ -63,7 +64,11 @@ public class Repl {
                     inGameClient.setPlayerColor("WHITE");
                 }
                 if (getCurrentClient() instanceof InGameClient && !List.of("help", "logout", "quit").contains(result)) {
-                    ChessBoardUI.drawBoard(inGameClient.getPlayerColor());
+                    if (Objects.equals(result, "observe")) {
+                        ChessBoardUI.drawBoard("WHITE");
+                    } else {
+                        ChessBoardUI.drawBoard(inGameClient.getPlayerColor());
+                    }
                 }
             } catch (Throwable e) {
                 var msg = e.toString();

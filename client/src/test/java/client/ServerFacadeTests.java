@@ -149,6 +149,22 @@ public class ServerFacadeTests {
     }
 
     @Test
+    public void observeGame() throws ResponseException {
+        RegisterRequest registerRequest = new RegisterRequest(testUser.username(), testUser.password(), testUser.email());
+        RegisterResult registerResult = serverFacade.register(registerRequest);
+
+        CreateGameRequest createGameRequest = new CreateGameRequest("testGame");
+        serverFacade.createGame(createGameRequest, registerResult.authToken());
+
+        JoinGameRequest joinGameRequest = new JoinGameRequest("observe", 1);
+        serverFacade.joinGame(joinGameRequest, registerResult.authToken());
+
+        ListGamesResult listGamesResult = serverFacade.listGames(registerResult.authToken());
+        assertNull(listGamesResult.games().getFirst().whiteUsername());
+        assertNull(listGamesResult.games().getFirst().blackUsername());
+    }
+
+    @Test
     public void listGames() throws ResponseException {
         RegisterRequest registerRequest = new RegisterRequest(testUser.username(), testUser.password(), testUser.email());
         RegisterResult registerResult = serverFacade.register(registerRequest);

@@ -47,6 +47,7 @@ public class LoggedInClient implements Client {
             case "create" -> createGame(params);
             case "list" -> listGames();
             case "join" -> joinGame(params);
+            case "observe" -> observe(params);
             case "logout" -> logout();
             default -> help();
         };
@@ -117,6 +118,30 @@ public class LoggedInClient implements Client {
     }
 
     /**
+     * Attempts to observe a game based on the GameID and playerColor
+     * set to "observe".
+     *
+     * @param params the list of user parameters a user may have observed
+     * @return a ClientResult response containing the result value, the new ClientState (if any),
+     *  and the authToken if received by a response result.
+     */
+    public ClientResult observe(String... params) {
+        if (params.length == 1) {
+            try {
+                var gameID = Integer.parseInt(params[0]);
+                JoinGameRequest joinGameRequest = new JoinGameRequest("observe", gameID);
+                serverFacade.joinGame(joinGameRequest, authToken);
+                return new ClientResult("observe", ClientState.OBSERVER, null);
+            } catch (ResponseException e) {
+                return handleError(e);
+            }
+        } else {
+            System.out.println("Arguments required: <GameID> [WHITE|BLACK]");
+            return new ClientResult("error", null, null);
+        }
+    }
+
+    /**
      * Attempts to retrieve the list of games from the server, sorts them from
      * lowest GameID to highest, and prints them out.
      *
@@ -165,7 +190,7 @@ public class LoggedInClient implements Client {
             "    " + SET_TEXT_COLOR_BLUE + "create <NAME>" + RESET_TEXT_COLOR + " - a game\n" +
             "    " + SET_TEXT_COLOR_BLUE + "list" + RESET_TEXT_COLOR + " - games\n" +
             "    " + SET_TEXT_COLOR_BLUE + "join <GameID> [WHITE|BLACK]" + RESET_TEXT_COLOR + " - a game\n" +
-            "    " + SET_TEXT_COLOR_RED + "observe <GameID>" + RESET_TEXT_COLOR + " - a game (not currently implemented)\n" +
+            "    " + SET_TEXT_COLOR_BLUE + "observe <GameID>" + RESET_TEXT_COLOR + " - a game to observe\n" +
             "    " + SET_TEXT_COLOR_BLUE + "logout" + RESET_TEXT_COLOR + " - when you are done\n" +
             "    " + SET_TEXT_COLOR_BLUE + "help" + RESET_TEXT_COLOR + " - with possible commands\n";
         System.out.print(helpText);

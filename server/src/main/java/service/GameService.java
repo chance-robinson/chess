@@ -11,8 +11,6 @@ import server.net.request.JoinGameRequest;
 import server.net.result.CreateGameResult;
 import server.net.result.ListGamesResult;
 
-import java.util.Objects;
-
 /**
  * The service pertaining to all methods related to the GameDAO
  */
@@ -102,21 +100,27 @@ public class GameService {
             throw new ServerException("Error: bad request", 400);
         }
 
-        if (Objects.equals(playerColor, "BLACK")) {
-            if (gameData.blackUsername() == null) {
-                gameData = new GameData(gameData.gameID(), gameData.whiteUsername(), authData.username(), gameData.gameName(), gameData.game());
-            } else {
-                throw new ServerException("Error: already taken", 403);
+        switch (playerColor) {
+            case "BLACK" -> {
+                if (gameData.blackUsername() == null) {
+                    gameData = new GameData(gameData.gameID(), gameData.whiteUsername(),
+                            authData.username(), gameData.gameName(), gameData.game());
+                } else {
+                    throw new ServerException("Error: already taken", 403);
+                }
             }
-        } else if (Objects.equals(playerColor, "WHITE")) {
-            if (gameData.whiteUsername() == null) {
-                gameData = new GameData(gameData.gameID(), authData.username(), gameData.blackUsername(), gameData.gameName(), gameData.game());
-            } else {
-                throw new ServerException("Error: already taken", 403);
+            case "WHITE" -> {
+                if (gameData.whiteUsername() == null) {
+                    gameData = new GameData(gameData.gameID(), authData.username(),
+                            gameData.blackUsername(), gameData.gameName(), gameData.game());
+                } else {
+                    throw new ServerException("Error: already taken", 403);
+                }
             }
-        }
-        else {
-            throw new ServerException("Error: bad request", 400);
+            case "observe" -> {
+                return;
+            }
+            default -> throw new ServerException("Error: bad request", 400);
         }
 
         gameDAO.update(gameData);
