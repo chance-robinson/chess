@@ -1,7 +1,7 @@
 package ui.client;
 
 import exception.ResponseException;
-import serverFacade.ServerFacade;
+import serverfacade.ServerFacade;
 import server.net.request.LoginRequest;
 import server.net.request.RegisterRequest;
 import server.net.result.LoginResult;

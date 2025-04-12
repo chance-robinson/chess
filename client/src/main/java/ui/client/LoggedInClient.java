@@ -2,7 +2,7 @@ package ui.client;
 
 import exception.ResponseException;
 import model.GameData;
-import serverFacade.ServerFacade;
+import serverfacade.ServerFacade;
 import server.net.request.CreateGameRequest;
 import server.net.request.JoinGameRequest;
 import server.net.result.CreateGameResult;
@@ -81,21 +81,21 @@ public class LoggedInClient implements Client {
     }
 
     // not implemented yet
-    public ClientResult observe(String... params) {
-        if (params.length == 1) {
-            try {
-                var gameID = Integer.parseInt(params[0]);
-                JoinGameRequest joinGameRequest = new JoinGameRequest(null, gameID);
-                serverFacade.joinGame(joinGameRequest, authToken);
-                return new ClientResult("observe", ClientState.OBSERVER, null);
-            } catch (ResponseException e) {
-                return handleError(e);
-            }
-        } else {
-            System.out.println("Not enough arguments");
-            return new ClientResult("observe", null, null);
-        }
-    }
+    //    public ClientResult observe(String... params) {
+    //        if (params.length == 1) {
+    //            try {
+    //                var gameID = Integer.parseInt(params[0]);
+    //                JoinGameRequest joinGameRequest = new JoinGameRequest(null, gameID);
+    //                serverFacade.joinGame(joinGameRequest, authToken);
+    //                return new ClientResult("observe", ClientState.OBSERVER, null);
+    //            } catch (ResponseException e) {
+    //                return handleError(e);
+    //            }
+    //        } else {
+    //            System.out.println("Not enough arguments");
+    //            return new ClientResult("observe", null, null);
+    //        }
+    //    }
 
     public ClientResult listGames() {
         try {
