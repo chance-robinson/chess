@@ -193,7 +193,7 @@ public class LoggedInClient implements Client {
         for (int i = 0; i < games.size(); i++) {
             GameData game = games.get(i);
             String whiteUsername = game.whiteUsername() != null ? game.whiteUsername() : "<JOIN-ABLE>";
-            String blackUsername = game.whiteUsername() != null ? game.whiteUsername() : "<JOIN-ABLE>";
+            String blackUsername = game.blackUsername() != null ? game.blackUsername() : "<JOIN-ABLE>";
             gamesListString.append(String.format(
                     "    " + SET_TEXT_COLOR_BLUE + "%d GameName" + RESET_TEXT_COLOR + ": %s " +
                             SET_TEXT_COLOR_BLUE + "White" + RESET_TEXT_COLOR + ": %s " +
