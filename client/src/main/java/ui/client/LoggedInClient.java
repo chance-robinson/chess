@@ -6,6 +6,8 @@ import serverfacade.ServerFacade;
 import server.net.request.CreateGameRequest;
 import server.net.request.JoinGameRequest;
 import server.net.result.ListGamesResult;
+import ui.client.websocket.NotificationHandler;
+import ui.client.websocket.WebSocketFacade;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,14 +23,16 @@ public class LoggedInClient implements Client {
     private static ServerFacade serverFacade;
     private String authToken = null;
     private ArrayList<GameData> listGames = new ArrayList<>();
+    private WebSocketFacade ws;
 
     /**
      * The constructor for the PreLoginClient, which sets up a connection to the server.
      *
      * @param serverUrl the specific server url
      */
-    public LoggedInClient(String serverUrl) {
+    public LoggedInClient(String serverUrl, NotificationHandler notificationHandler) throws ResponseException {
         serverFacade = new ServerFacade(serverUrl);
+        ws = new WebSocketFacade(serverUrl, notificationHandler);
     }
 
     /**

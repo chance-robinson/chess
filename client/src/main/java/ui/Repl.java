@@ -1,6 +1,12 @@
 package ui;
 
+import exception.ResponseException;
 import ui.client.*;
+import ui.client.websocket.NotificationHandler;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
 import java.util.List;
 import java.util.Objects;
@@ -13,7 +19,7 @@ import static ui.EscapeSequences.*;
  * between the 3 specific clients: PreLogin, LoggedIn, and InGame, as well as all the
  * terminal display logic.
  */
-public class Repl {
+public class Repl implements NotificationHandler {
     private final PreLoginClient preLoginClient;
     private final LoggedInClient loggedInClient;
     private final InGameClient inGameClient;
@@ -26,10 +32,10 @@ public class Repl {
      *
      * @param serverUrl the server url of the chess server
      */
-    public Repl(String serverUrl) {
+    public Repl(String serverUrl) throws ResponseException {
         preLoginClient = new PreLoginClient(serverUrl);
-        loggedInClient = new LoggedInClient(serverUrl);
-        inGameClient = new InGameClient(serverUrl);
+        loggedInClient = new LoggedInClient(serverUrl, this);
+        inGameClient = new InGameClient(serverUrl, this);
     }
 
     /**
@@ -111,5 +117,22 @@ public class Repl {
             case INGAME -> "[CHESS_GAME] >>> ";
             case OBSERVER -> "[OBSERVER] >>> ";
         };
+    }
+
+    public void notify(ServerMessage message) {
+        switch (message.getServerMessageType()) {
+            case LOAD_GAME -> loadGame(((LoadGameMessage) message).getLoadGameMessage());
+            case NOTIFICATION -> displayNotification(((NotificationMessage) message).getNotificationMessage());
+            case ERROR -> displayError(((ErrorMessage) message).getErrorMessage());
+        }
+    }
+
+    private void displayError(String errorMessage) {
+    }
+
+    private void displayNotification(String notificationMessage) {
+    }
+
+    private void loadGame(String loadGameMessage) {
     }
 }

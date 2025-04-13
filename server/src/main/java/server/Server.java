@@ -34,6 +34,8 @@ public class Server {
 
         Spark.staticFiles.location("web");
 
+        Spark.webSocket("/ws", Server.class);
+
         // Register your endpoints and handle exceptions here.
         createRoutes();
 
