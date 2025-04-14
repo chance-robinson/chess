@@ -116,13 +116,15 @@ public class LoggedInClient implements Client {
                 }
                 JoinGameRequest joinGameRequest = new JoinGameRequest(playerColor, gameID);
                 serverFacade.joinGame(joinGameRequest, authToken);
+                ws.connect(authToken, gameID, playerColor);
                 return new ClientResult(String.format("join:%s",playerColor), ClientState.INGAME, null);
             } catch (NumberFormatException | IndexOutOfBoundsException e) {
                 System.out.printf(SET_TEXT_COLOR_YELLOW + "    Error: <ID> must be of type Integer, greater than 0, " +
                         "and must be in the list of games.\n" + RESET_TEXT_COLOR);
                 return new ClientResult("error", null, null);
-            }  catch (ResponseException e) {
-                return handleError(e);
+            }  catch (ResponseException | IOException e) {
+                assert e instanceof ResponseException;
+                return handleError((ResponseException) e);
             }
         } else {
             System.out.println(SET_TEXT_COLOR_YELLOW + "    " + "Arguments required: join <ID> [WHITE|BLACK]" + RESET_TEXT_COLOR);

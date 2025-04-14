@@ -14,6 +14,7 @@ import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
+import java.util.Objects;
 
 
 @WebSocket
@@ -51,7 +52,10 @@ public class WebSocketHandler {
                     connect(username, gameData, connectCommand);
                 }
                 case MAKE_MOVE -> makeMove(session, username, (MakeMoveCommand) command);
-                case LEAVE -> leave(session, username, (LeaveCommand) command);
+                case LEAVE -> {
+                    LeaveCommand leaveCommand = new Gson().fromJson(message, LeaveCommand.class);
+                    leave(session, username, leaveCommand, gameData);
+                }
                 case RESIGN -> resign(session, username, (ResignCommand) command);
             }
         } catch (Exception e) {
@@ -63,7 +67,34 @@ public class WebSocketHandler {
     private void resign(Session session, String username, ResignCommand command) {
     }
 
-    private void leave(Session session, String username, LeaveCommand command) {
+    private void leave(Session session, String username, LeaveCommand command, GameData gameData) throws IOException {
+        String playerColor = command.getPlayerColor();
+        if (Objects.equals(playerColor, "WHITE") && Objects.equals(username, gameData.whiteUsername())) {
+            GameData newGameData = new GameData(
+                    gameData.gameID(),
+                    null,
+                    gameData.blackUsername(),
+                    gameData.gameName(),
+                    gameData.game()
+            );
+            gameDAO.update(newGameData);
+        } else if (Objects.equals(playerColor, "BLACK") && Objects.equals(username, gameData.blackUsername())) {
+            GameData newGameData = new GameData(
+                    gameData.gameID(),
+                    gameData.whiteUsername(),
+                    null,
+                    gameData.gameName(),
+                    gameData.game()
+            );
+            gameDAO.update(newGameData);
+        }
+
+        connections.remove(username, gameData.gameID());
+
+        connections.broadcast(username,
+                new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
+                String.format(username + " has left as " + command.getPlayerColor())),
+                gameData.gameID());
     }
 
     private void makeMove(Session session, String username, MakeMoveCommand command) {
@@ -79,5 +110,5 @@ public class WebSocketHandler {
     private String getUsername(String authToken) {
         AuthData authData = authDAO.getAuth(authToken);
         return authData.username();
-    };
+    }
 }

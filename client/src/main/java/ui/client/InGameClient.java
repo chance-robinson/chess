@@ -5,6 +5,7 @@ import model.GameData;
 import serverfacade.ServerFacade;
 import ui.client.websocket.WebSocketFacade;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 import static ui.EscapeSequences.*;
@@ -20,15 +21,17 @@ public class InGameClient implements Client {
     private String playerColor = "WHITE";
     private GameData gameData = null;
     private final WebSocketFacade ws;
+    private ClientState state;
 
     /**
      * The constructor for the InGameClient, which sets up a connection to the server.
      *
      * @param serverUrl the specific server url
      */
-    public InGameClient(String serverUrl,  WebSocketFacade ws) {
+    public InGameClient(String serverUrl,  WebSocketFacade ws, ClientState state) {
         serverFacade = new ServerFacade(serverUrl);
         this.ws = ws;
+        this.state = state;
     }
 
     /**
@@ -45,9 +48,21 @@ public class InGameClient implements Client {
         var params = Arrays.copyOfRange(tokens, 1, tokens.length);
         return switch (cmd) {
             case "redraw" -> new ClientResult("redraw", null, null);
+            case "leave" -> leave();
             case "logout" -> logout();
             default -> help();
         };
+    }
+
+    private ClientResult leave() {
+        try {
+            String playerColorType = state == ClientState.OBSERVER ? "OBSERVER" : playerColor;
+            ws.leave(authToken, gameData.gameID(), playerColorType);
+            System.out.println(SET_TEXT_COLOR_GREEN + "    " + "You have left the game." + RESET_TEXT_COLOR);
+            return new ClientResult("logout", ClientState.SIGNEDOUT, null);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**

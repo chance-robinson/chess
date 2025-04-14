@@ -39,7 +39,7 @@ public class Repl implements NotificationHandler {
         ws = new WebSocketFacade(serverUrl, this);
         preLoginClient = new PreLoginClient(serverUrl);
         loggedInClient = new LoggedInClient(serverUrl, ws);
-        inGameClient = new InGameClient(serverUrl, ws);
+        inGameClient = new InGameClient(serverUrl, ws, state);
     }
 
     /**
@@ -132,6 +132,9 @@ public class Repl implements NotificationHandler {
     }
 
     private void displayError(String errorMessage) {
+        System.out.println(SET_TEXT_COLOR_RED + SET_TEXT_BOLD + "\n    " + errorMessage
+                + RESET_TEXT_COLOR + RESET_TEXT_BOLD_FAINT);
+        printPrompt();
     }
 
     private void displayNotification(String notificationMessage) {
