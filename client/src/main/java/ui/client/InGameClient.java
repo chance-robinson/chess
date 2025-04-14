@@ -75,7 +75,7 @@ public class InGameClient implements Client {
     }
 
     private ClientResult redraw() {
-        ChessBoardUI.drawBoard(playerColor);
+        ChessBoardUI.drawBoard(playerColor, gameData.game());
         return new ClientResult("redraw", null, null);
     }
 

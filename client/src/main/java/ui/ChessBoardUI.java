@@ -1,28 +1,34 @@
 package ui;
 
+import chess.ChessBoard;
+import chess.ChessGame;
+import chess.ChessPiece;
+import chess.ChessPosition;
+
 import static ui.EscapeSequences.*;
 
 /**
  *  Temporary class for drawing the ChessBoardUI based on a given playerColor perspective.
  */
 public class ChessBoardUI {
-    private static final char[][] DEFAULT_BOARD  = {
-        {'R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'},
-        {'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'},
+    private static final char[][] CHESS_BOARD = {
         {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
         {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
         {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
         {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
-        {'p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'},
-        {'r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'}
+        {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+        {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+        {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+        {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '}
     };
+
 
     /**
      * Renders the chessBoard based on the playerColor perspective.
      *
      * @param playerColor the playerColor to base render off of.
      */
-    public static void drawBoard(String playerColor) {
+    public static void drawBoard(String playerColor, ChessGame chessGame) {
         boolean isWhite = !playerColor.equals("BLACK");
         int[] rowOrder = isWhite ? new int[]{8,7,6,5,4,3,2,1} : new int[]{1,2,3,4,5,6,7,8};
         int[] colOrder = isWhite ? new int[]{1,2,3,4,5,6,7,8} : new int[]{8,7,6,5,4,3,2,1};
@@ -35,10 +41,14 @@ public class ChessBoardUI {
         }
         System.out.println("   " + RESET_BG_COLOR + RESET_TEXT_COLOR);
 
+        ChessBoard chessBoard = chessGame.getBoard();
+
         for (int row: rowOrder) {
             System.out.print(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_YELLOW + " " + row + " " + RESET_BG_COLOR + RESET_TEXT_COLOR);
             for (int col: colOrder) {
-                char piece = DEFAULT_BOARD[row-1][col-1];
+                char pieceFromBoard = getPieceFromBoard(chessBoard, row, col);
+                CHESS_BOARD[row-1][col-1] = pieceFromBoard;
+                char piece = CHESS_BOARD[row-1][col-1];
                 String pieceColor = getPieceColor(piece);
 
                 boolean alternate = (row + col) % 2 == 0;
@@ -71,5 +81,22 @@ public class ChessBoardUI {
         } else {
             return SET_TEXT_COLOR_BLACK + piece + RESET_TEXT_COLOR;
         }
+    }
+
+    private static char getPieceFromBoard(ChessBoard chessboard, int row, int col) {
+        ChessPiece piece = chessboard.getPiece(new ChessPosition(row, col));
+
+        if (piece == null) {
+            return ' ';
+        }
+
+        return switch (piece.getPieceType()) {
+            case ROOK -> (piece.getTeamColor() == ChessGame.TeamColor.WHITE) ? 'R' : 'r';
+            case KNIGHT -> (piece.getTeamColor() == ChessGame.TeamColor.WHITE) ? 'N' : 'n';
+            case BISHOP -> (piece.getTeamColor() == ChessGame.TeamColor.WHITE) ? 'B' : 'b';
+            case QUEEN -> (piece.getTeamColor() == ChessGame.TeamColor.WHITE) ? 'Q' : 'q';
+            case KING -> (piece.getTeamColor() == ChessGame.TeamColor.WHITE) ? 'K' : 'k';
+            case PAWN -> (piece.getTeamColor() == ChessGame.TeamColor.WHITE) ? 'P' : 'p';
+        };
     }
 }
