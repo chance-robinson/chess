@@ -39,6 +39,11 @@ public class InGameClient implements Client {
         this.state = state;
     }
 
+    /**
+     * Sets the gameData to be used in the InGameClient
+     *
+     * @param gameData the most recent gameData
+     */
     public void setGameData(GameData gameData) {
         this.gameData = gameData;
     }
@@ -66,6 +71,12 @@ public class InGameClient implements Client {
         };
     }
 
+    /**
+     * Allows a user to resign the game.
+     *
+     * @return a generic ClientResult response
+     * @throws IOException if an IOException was thrown
+     */
     private ClientResult resign() throws IOException {
         if (this.state == ClientState.INGAME) {
             ws.resign(authData.authToken(), gameData.gameID());
@@ -75,12 +86,25 @@ public class InGameClient implements Client {
         return new ClientResult("resign", null, null);
     }
 
+    /**
+     * Redraws the Chess board UI.
+     *
+     * @param highlightLegalMoves a boolean indicating whether to highlight legal moves
+     * @param chessPosition if highlightLegalMoves is true then give the chessPosition to highlight
+     * @return a generic ClientResult
+     */
     private ClientResult redraw(boolean highlightLegalMoves, ChessPosition chessPosition) {
         ChessBoardUI.drawBoard(playerColor, gameData.game(), highlightLegalMoves, chessPosition);
         return new ClientResult("redraw", null, null);
     }
 
-    private ClientResult highlightLegalMoves(String... params) throws IOException {
+    /**
+     * Highlights the legal moves for the selected position.
+     *
+     * @param params the curPos of a move
+     * @return a generic ClientResult
+     */
+    private ClientResult highlightLegalMoves(String... params) {
         if (params.length == 1) {
             var curPos = params[0].toLowerCase();
             if (!isValidPosition(curPos)) {
@@ -110,6 +134,15 @@ public class InGameClient implements Client {
         }
     }
 
+    /**
+     * Allows a user to make a move from a startPos to an endPos
+     * given that it is valid, and if there is a promotion then the user can select
+     * the promotion piece as well.
+     *
+     * @param params a startPos and an endPos designated by the user
+     * @return a genericClient response
+     * @throws IOException if there was an IOException
+     */
     private ClientResult makeMove(String... params) throws IOException {
         if (params.length == 2) {
             var startPos = params[0].toLowerCase();
@@ -165,6 +198,11 @@ public class InGameClient implements Client {
         }
     }
 
+    /**
+     * This is for telling a user what promotion pieces they can select.
+     *
+     * @return the specific PieceType
+     */
     private ChessPiece.PieceType getPromotionPiece() {
         System.out.println(SET_TEXT_COLOR_BLUE + "    Promotion piece selection available:");
         System.out.println(SET_TEXT_COLOR_BLUE + "        rook");
@@ -185,6 +223,12 @@ public class InGameClient implements Client {
         };
     }
 
+    /**
+     * Returns whether or not a position is valid.
+     *
+     * @param pos the string pos of a move
+     * @return true if it is valid false otherwise
+     */
     private boolean isValidPosition(String pos) {
         if (pos.length() != 2) {
             return false;
@@ -195,12 +239,17 @@ public class InGameClient implements Client {
         return (file >= 'a' && file <= 'h') && (rank >= '1' && rank <= '8');
     }
 
+    /**
+     * Leaves the current game.
+     *
+     * @return a generic ClientResult response indicating to stay signed in
+     */
     private ClientResult leave() {
         try {
             String playerColorType = state == ClientState.OBSERVER ? "OBSERVER" : playerColor;
             ws.leave(authData.authToken(), gameData.gameID(), playerColorType);
             System.out.println(SET_TEXT_COLOR_GREEN + "    " + "You have left the game." + RESET_TEXT_COLOR);
-            return new ClientResult("logout", ClientState.SIGNEDIN, null);
+            return new ClientResult("leave", ClientState.SIGNEDIN, null);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -259,6 +308,11 @@ public class InGameClient implements Client {
         this.playerColor = playerColor;
     }
 
+    /**
+     * Sets the client to a specific ClientState either OBSERVER or INGAME
+     *
+     * @param clientState the clientstate to stay in for the client
+     */
     public void setState(ClientState clientState) {
         this.state = clientState;
     }

@@ -7,7 +7,8 @@ import java.util.Collection;
 import static ui.EscapeSequences.*;
 
 /**
- *  Temporary class for drawing the ChessBoardUI based on a given playerColor perspective.
+ *  The class for rendering the Chess Board based on a given playerColor perspective
+ *  and specific ChessGame data.
  */
 public class ChessBoardUI {
     private static final char[][] CHESS_BOARD = {
@@ -23,7 +24,8 @@ public class ChessBoardUI {
 
 
     /**
-     * Renders the chessBoard based on the playerColor perspective.
+     * Renders the chessBoard based on the playerColor perspective and the
+     * current ChessGame.
      *
      * @param playerColor the playerColor to base render off of.
      */
@@ -63,6 +65,17 @@ public class ChessBoardUI {
         System.out.println("   " + RESET_BG_COLOR + RESET_TEXT_COLOR);
     }
 
+    /**
+     * Returns the given bgColor based on alternation, as well as
+     * whether a tile is meant to be highlighted or not.
+     *
+     * @param row the current row being drawn
+     * @param col the current col being drawn
+     * @param highlightLegalMoves if we are highlighting moves
+     * @param chessPosition the current chessPosition
+     * @param chessGame the current chessGame
+     * @return the string containing the bgColor
+     */
     private static String getBgColor(int row, int col, boolean highlightLegalMoves,
                                      ChessPosition chessPosition, ChessGame chessGame) {
         boolean alternate = (row + col) % 2 == 0;
@@ -102,6 +115,15 @@ public class ChessBoardUI {
         }
     }
 
+    /**
+     * Returns the piece we want to assign to our ChessBoardUI from
+     * the ChessBoard.
+     *
+     * @param chessboard the given ChessBoard
+     * @param row the current row being drawn
+     * @param col the current col being drawn
+     * @return the char to assign to the board being drawn
+     */
     private static char getPieceFromBoard(ChessBoard chessboard, int row, int col) {
         ChessPiece piece = chessboard.getPiece(new ChessPosition(row, col));
 

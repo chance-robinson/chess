@@ -110,6 +110,12 @@ public class Repl implements NotificationHandler {
         };
     }
 
+    /**
+     * Notify the user of a change on the websocket.
+     *
+     * @param message the message deciding what use case will fit
+     * @throws IOException if an IOException happened while getting data
+     */
     public void notify(ServerMessage message) throws IOException {
         switch (message.getServerMessageType()) {
             case LOAD_GAME -> loadGame(((LoadGameMessage) message).getGameData());
@@ -118,18 +124,37 @@ public class Repl implements NotificationHandler {
         }
     }
 
+    /**
+     * Displays an error notification whenever an error has occurred on the
+     * websocket.
+     *
+     * @param errorMessage a string containing the error
+     */
     private void displayError(String errorMessage) {
         System.out.println(SET_TEXT_COLOR_RED + SET_TEXT_BOLD + "\n    " + errorMessage
                 + RESET_TEXT_COLOR + RESET_TEXT_BOLD_FAINT);
         printPrompt();
     }
 
+    /**
+     * Displays a notification whenever a notificationMessage has occurred on the
+     * websocket.
+     *
+     * @param notificationMessage the notification message to display
+     */
     private void displayNotification(String notificationMessage) {
         System.out.println(SET_TEXT_COLOR_BLUE + SET_TEXT_BOLD + "\n    " + notificationMessage
                 + RESET_TEXT_COLOR + RESET_TEXT_BOLD_FAINT);
         printPrompt();
     }
 
+    /**
+     * Loads data into the inGameClient everytime a LOAD_GAME notification
+     * has been received and redraws the board.
+     *
+     * @param gameData the gameData to set on the inGameClient
+     * @throws IOException if an IOException happened while getting data
+     */
     private void loadGame(GameData gameData) throws IOException {
         String playerColor;
         if (state == ClientState.OBSERVER) {

@@ -117,6 +117,11 @@ public class PreLoginClient implements Client {
         }
     }
 
+    /**
+     * Sets the authData on the REPL class to be shared across all clients.
+     *
+     * @return the AuthData for the logged-in user
+     */
     public AuthData getAuthData() {
         return authData;
     }
