@@ -50,25 +50,7 @@ public class ChessBoardUI {
                 char piece = CHESS_BOARD[row-1][col-1];
                 String pieceColor = getPieceColor(piece);
 
-                boolean alternate = (row + col) % 2 == 0;
-                String bgColor = alternate ? SET_BG_COLOR_DARK_GREY : SET_BG_COLOR_LIGHT_GREY;
-                if (highlightLegalMoves) {
-                    Collection<ChessMove> validMoves = chessGame.validMoves(chessPosition);
-                    boolean isLegal = false;
-                    if (chessPosition.getRow() == row && chessPosition.getColumn() == col) {
-                        bgColor = SET_BG_COLOR_YELLOW;
-                    } else {
-                        for (ChessMove move : validMoves) {
-                            if (move.getEndPosition().getRow() == row && move.getEndPosition().getColumn() == col) {
-                                isLegal = true;
-                                break;
-                            }
-                        }
-                        if (isLegal) {
-                            bgColor = SET_BG_COLOR_LIGHT_YELLOW;
-                        }
-                    }
-                }
+                String bgColor = getBgColor(row, col, highlightLegalMoves, chessPosition, chessGame);
                 System.out.print(RESET_BG_COLOR + bgColor + " " + pieceColor + " ");
             }
             System.out.print(SET_BG_COLOR_BLACK + " " + SET_TEXT_COLOR_YELLOW + row + " " + RESET_BG_COLOR + RESET_TEXT_COLOR + "\n");
@@ -79,6 +61,27 @@ public class ChessBoardUI {
             System.out.print(" " + colNames[col-1] + " ");
         }
         System.out.println("   " + RESET_BG_COLOR + RESET_TEXT_COLOR);
+    }
+
+    private static String getBgColor(int row, int col, boolean highlightLegalMoves,
+                                     ChessPosition chessPosition, ChessGame chessGame) {
+        boolean alternate = (row + col) % 2 == 0;
+        String bgColor = alternate ? SET_BG_COLOR_DARK_GREY : SET_BG_COLOR_LIGHT_GREY;
+
+        if (!highlightLegalMoves) {
+            return bgColor;
+        }
+        Collection<ChessMove> validMoves = chessGame.validMoves(chessPosition);
+        if (chessPosition.getRow() == row && chessPosition.getColumn() == col) {
+            return SET_BG_COLOR_YELLOW;
+        }
+        for (ChessMove move : validMoves) {
+            if (move.getEndPosition().getRow() == row && move.getEndPosition().getColumn() == col) {
+                return SET_BG_COLOR_LIGHT_YELLOW;
+            }
+        }
+
+        return bgColor;
     }
 
     /**
