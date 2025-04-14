@@ -11,6 +11,8 @@ import server.net.request.JoinGameRequest;
 import server.net.result.CreateGameResult;
 import server.net.result.ListGamesResult;
 
+import java.util.Objects;
+
 /**
  * The service pertaining to all methods related to the GameDAO
  */
@@ -102,7 +104,7 @@ public class GameService {
 
         switch (playerColor) {
             case "BLACK" -> {
-                if (gameData.blackUsername() == null) {
+                if (gameData.blackUsername() == null || Objects.equals(authDAO.getAuth(authToken).username(), gameData.blackUsername())) {
                     gameData = new GameData(gameData.gameID(), gameData.whiteUsername(),
                             authData.username(), gameData.gameName(), gameData.game());
                 } else {
@@ -110,7 +112,7 @@ public class GameService {
                 }
             }
             case "WHITE" -> {
-                if (gameData.whiteUsername() == null) {
+                if (gameData.whiteUsername() == null || Objects.equals(authDAO.getAuth(authToken).username(), gameData.whiteUsername())) {
                     gameData = new GameData(gameData.gameID(), authData.username(),
                             gameData.blackUsername(), gameData.gameName(), gameData.game());
                 } else {

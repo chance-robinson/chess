@@ -108,7 +108,8 @@ public class InGameClient implements Client {
         if (params.length == 1) {
             var curPos = params[0].toLowerCase();
             if (!isValidPosition(curPos)) {
-                System.out.println(SET_TEXT_COLOR_YELLOW + "    Invalid move format. Use positions like 'e2' or 'h7'." + RESET_TEXT_COLOR);
+                System.out.println(SET_TEXT_COLOR_YELLOW + "    Invalid move format. Use positions like 'e2' or 'h7'" +
+                        " as follows: \"highlight e2\"" + RESET_TEXT_COLOR);
                 return new ClientResult("error", null, null);
             }
             int curRow, curCol;
@@ -120,7 +121,8 @@ public class InGameClient implements Client {
                 }
             } catch (NumberFormatException e) {
                 System.out.println(SET_TEXT_COLOR_YELLOW + "    " + "Need <CUR_POS> to be within"
-                        + "1-8 for rows and a-h for columns in format <Column,Row> for each position." + RESET_TEXT_COLOR);
+                        + "1-8 for rows and a-h for columns in format <Column,Row> for each position." + "\n    " +
+                        "Use as follows: \"move: e2 c4\"" + RESET_TEXT_COLOR);
                 return new ClientResult("error", null, null);
             }
 
@@ -129,7 +131,8 @@ public class InGameClient implements Client {
             return new ClientResult("highlight", null, null);
         }
         else {
-            System.out.println(SET_TEXT_COLOR_YELLOW + "    " + "Arguments required: move <START_POS> <END_POSITION>" + RESET_TEXT_COLOR);
+            System.out.println(SET_TEXT_COLOR_YELLOW + "    " + "Arguments required: \"move <START_POS> <END_POSITION> " +
+                    "using positions like 'e2' or 'h7'\"" + RESET_TEXT_COLOR);
             return new ClientResult("error", null, null);
         }
     }
@@ -144,56 +147,62 @@ public class InGameClient implements Client {
      * @throws IOException if there was an IOException
      */
     private ClientResult makeMove(String... params) throws IOException {
-        if (params.length == 2) {
-            var startPos = params[0].toLowerCase();
-            var endPos = params[1].toLowerCase();
-            if (!isValidPosition(startPos) || !isValidPosition(endPos)) {
-                System.out.println(SET_TEXT_COLOR_YELLOW + "    Invalid move format. Use positions like 'e2' or 'h7'." + RESET_TEXT_COLOR);
-                return new ClientResult("error", null, null);
-            }
-            int startRow, startCol, endRow, endCol;
-            try {
-                startCol = startPos.charAt(0) - 'a' + 1;
-                startRow = Integer.parseInt(String.valueOf(startPos.charAt(1)));
-                endRow = Integer.parseInt(String.valueOf(endPos.charAt(1)));
-                endCol = endPos.charAt(0) - 'a' + 1;
-                if (startRow < 1 || startRow > 8 || startCol < 1 || startCol > 8
-                        || endRow < 1 || endRow > 8 || endCol < 1 || endCol > 8) {
-                    throw new NumberFormatException();
+        if (state != ClientState.OBSERVER) {
+            if (params.length == 2) {
+                var startPos = params[0].toLowerCase();
+                var endPos = params[1].toLowerCase();
+                if (!isValidPosition(startPos) || !isValidPosition(endPos)) {
+                    System.out.println(SET_TEXT_COLOR_YELLOW + "    " + "Need both <START_POS> and <END_POS> to be within"
+                            + "1-8 for rows and a-h for columns in format <Column,Row> for each position." + "\n    " +
+                            "Use as follows: \"move: e2 c4\"" + RESET_TEXT_COLOR);
+                    return new ClientResult("error", null, null);
                 }
-            } catch (NumberFormatException e) {
-                System.out.println(SET_TEXT_COLOR_YELLOW + "    " + "Need <START_POS> and <END_POS> to be within "
-                        + "1-8 for rows and a-h for columns in format <Column,Row> for each position." + RESET_TEXT_COLOR);
-                return new ClientResult("error", null, null);
-            }
-            ChessPosition startPosition = new ChessPosition(startRow, startCol);
-            ChessPosition endPosition = new ChessPosition(endRow, endCol);
-            ChessPiece.PieceType promotionPiece = null;
-            ChessPiece pieceType = gameData.game().getBoard().getPiece(startPosition);
-            ChessPiece.PieceType pieceType1 = pieceType.getPieceType();
-            String teamColor = pieceType.getTeamColor().toString();
-            if (!Objects.equals(teamColor, playerColor)) {
-                System.out.println(SET_TEXT_COLOR_YELLOW + "    Invalid starting position" + RESET_TEXT_COLOR);
-                return new ClientResult("makeMove", null, null);
-            }
-            if ((Objects.equals(teamColor, "WHITE") && endRow == 8 && pieceType1 == ChessPiece.PieceType.PAWN) ||
-                    ((Objects.equals(teamColor, "BLACK") && endRow == 1 && pieceType1 == ChessPiece.PieceType.PAWN))) {
-                while (promotionPiece == null) {
+                int startRow, startCol, endRow, endCol;
+                try {
+                    startCol = startPos.charAt(0) - 'a' + 1;
+                    startRow = Integer.parseInt(String.valueOf(startPos.charAt(1)));
+                    endRow = Integer.parseInt(String.valueOf(endPos.charAt(1)));
+                    endCol = endPos.charAt(0) - 'a' + 1;
+                    if (startRow < 1 || startRow > 8 || startCol < 1 || startCol > 8
+                            || endRow < 1 || endRow > 8 || endCol < 1 || endCol > 8) {
+                        throw new NumberFormatException();
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println(SET_TEXT_COLOR_YELLOW + "    " + "Need both <START_POS> and <END_POS> to be within"
+                            + "1-8 for rows and a-h for columns in format <Column,Row> for each position." + "\n    " +
+                            "Use as follows: \"move: e2 c4\"" + RESET_TEXT_COLOR);
+                    return new ClientResult("error", null, null);
+                }
+                ChessPosition startPosition = new ChessPosition(startRow, startCol);
+                ChessPosition endPosition = new ChessPosition(endRow, endCol);
+                ChessPiece.PieceType promotionPiece = null;
+                ChessPiece pieceType = gameData.game().getBoard().getPiece(startPosition);
+                ChessPiece.PieceType pieceType1 = pieceType.getPieceType();
+                String teamColor = pieceType.getTeamColor().toString();
+                if (!Objects.equals(teamColor, playerColor)) {
+                    System.out.println(SET_TEXT_COLOR_YELLOW + "    Invalid starting position: must be within 1-8 for rows and a-h for columns" +
+                            " and be a a valid move." + RESET_TEXT_COLOR);
+                    return new ClientResult("makeMove", null, null);
+                }
+                if ((Objects.equals(teamColor, "WHITE") && endRow == 8 && pieceType1 == ChessPiece.PieceType.PAWN) ||
+                        ((Objects.equals(teamColor, "BLACK") && endRow == 1 && pieceType1 == ChessPiece.PieceType.PAWN))) {
                     promotionPiece = getPromotionPiece();
-                    System.out.println(SET_TEXT_COLOR_YELLOW + "    Select correct promotion piece");
                 }
-            }
 
-            ChessMove chessMove = new ChessMove(startPosition, endPosition, promotionPiece);
-            if (!gameData.game().validMoves(startPosition).contains(chessMove)) {
-                System.out.println(SET_TEXT_COLOR_YELLOW + "\n    Invalid move" + RESET_TEXT_COLOR);
+                ChessMove chessMove = new ChessMove(startPosition, endPosition, promotionPiece);
+                if (!gameData.game().validMoves(startPosition).contains(chessMove)) {
+                    System.out.println(SET_TEXT_COLOR_YELLOW + "\n    Invalid move" + RESET_TEXT_COLOR);
+                    return new ClientResult("makeMove", null, null);
+                }
+                ws.makeMove(authData.authToken(), gameData.gameID(), chessMove);
                 return new ClientResult("makeMove", null, null);
+            } else {
+                System.out.println(SET_TEXT_COLOR_YELLOW + "    " + "Arguments required: \"move <START_POS> <END_POSITION> " +
+                        "using positions like 'e2' or 'h7'\"" + RESET_TEXT_COLOR);
+                return new ClientResult("error", null, null);
             }
-            ws.makeMove(authData.authToken(), gameData.gameID(), chessMove);
-            return new ClientResult("makeMove", null, null);
-        }
-        else {
-            System.out.println(SET_TEXT_COLOR_YELLOW + "    " + "Arguments required: move <START_POS> <END_POSITION>" + RESET_TEXT_COLOR);
+        } else {
+            System.out.println(SET_TEXT_COLOR_YELLOW + "    " + "Only players are allowed to make moves." + RESET_TEXT_COLOR);
             return new ClientResult("error", null, null);
         }
     }
@@ -204,23 +213,36 @@ public class InGameClient implements Client {
      * @return the specific PieceType
      */
     private ChessPiece.PieceType getPromotionPiece() {
-        System.out.println(SET_TEXT_COLOR_BLUE + "    Promotion piece selection available:");
-        System.out.println(SET_TEXT_COLOR_BLUE + "        rook");
-        System.out.println(SET_TEXT_COLOR_BLUE + "        knight");
-        System.out.println(SET_TEXT_COLOR_BLUE + "        bishop");
-        System.out.println(SET_TEXT_COLOR_BLUE + "        queen" + RESET_TEXT_COLOR);
         Scanner scanner = new Scanner(System.in);
-        String eval = scanner.nextLine();
-        return switch (eval) {
-            case "rook" -> ChessPiece.PieceType.ROOK;
-            case "knight" -> ChessPiece.PieceType.KNIGHT;
-            case "bishop" -> ChessPiece.PieceType.BISHOP;
-            case "queen" -> ChessPiece.PieceType.QUEEN;
-            default -> {
-                System.out.println(SET_TEXT_COLOR_RED + "Select either: \"rook, knight, bishop, or queen\"");
-                yield getPromotionPiece();
+        boolean firstIteration = true;
+
+        while (true) {
+            if (firstIteration) {
+                System.out.println(SET_TEXT_COLOR_BLUE + "    Promotion piece selection available, " +
+                        "select from the following and hit enter:");
+                System.out.println(SET_TEXT_COLOR_BLUE + "        rook");
+                System.out.println(SET_TEXT_COLOR_BLUE + "        knight");
+                System.out.println(SET_TEXT_COLOR_BLUE + "        bishop");
+                System.out.println(SET_TEXT_COLOR_BLUE + "        queen" + RESET_TEXT_COLOR);
+                firstIteration = false;
             }
-        };
+
+            System.out.print("[ENTER_PROMOTION_PIECE] >>> ");
+            String eval = scanner.nextLine();
+
+            switch (eval) {
+                case "rook":
+                    return ChessPiece.PieceType.ROOK;
+                case "knight":
+                    return ChessPiece.PieceType.KNIGHT;
+                case "bishop":
+                    return ChessPiece.PieceType.BISHOP;
+                case "queen":
+                    return ChessPiece.PieceType.QUEEN;
+                default:
+                    System.out.println(SET_TEXT_COLOR_YELLOW + "    Select either: \"rook, knight, bishop, or queen\"" + RESET_TEXT_COLOR);
+            }
+        }
     }
 
     /**
@@ -279,7 +301,7 @@ public class InGameClient implements Client {
         String helpText =
             "    " + SET_TEXT_COLOR_BLUE + "redraw" + RESET_TEXT_COLOR + " - redraws chess board\n" +
             "    " + SET_TEXT_COLOR_BLUE + "highlight" + RESET_TEXT_COLOR + " - highlight all moves for a position " +
-                    "using format \"highlight <CUR_POS> where the position is in format <Column, Row>\n" +
+                    "using format \"highlight <CUR_POS>\" where the position is in format <Column, Row>\n" +
             "    " + SET_TEXT_COLOR_BLUE + "move" + RESET_TEXT_COLOR + " - make move using format \"move <START_POS> <END_POS>\"" +
                     " where each position is in format <Column, Row>\n" +
             "    " + SET_TEXT_COLOR_BLUE + "leave" + RESET_TEXT_COLOR + " - leave chess game\n" +

@@ -36,6 +36,7 @@ public class ChessBoardUI {
         char[] colNames = new char[]{'a','b','c','d','e','f','g','h'};
 
         System.out.println();
+        System.out.println("    Current Turn: " + chessGame.getTeamTurn());
         System.out.print(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_YELLOW + "   ");
         for (int col: colOrder) {
             System.out.print(" " + colNames[col-1] + " ");
@@ -43,6 +44,10 @@ public class ChessBoardUI {
         System.out.println("   " + RESET_BG_COLOR + RESET_TEXT_COLOR);
 
         ChessBoard chessBoard = chessGame.getBoard();
+        Collection<ChessMove> validMoves = null;
+        if (highlightLegalMoves) {
+            validMoves = chessGame.validMoves(chessPosition);
+        }
 
         for (int row: rowOrder) {
             System.out.print(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_YELLOW + " " + row + " " + RESET_BG_COLOR + RESET_TEXT_COLOR);
@@ -52,7 +57,7 @@ public class ChessBoardUI {
                 char piece = CHESS_BOARD[row-1][col-1];
                 String pieceColor = getPieceColor(piece);
 
-                String bgColor = getBgColor(row, col, highlightLegalMoves, chessPosition, chessGame);
+                String bgColor = getBgColor(row, col, highlightLegalMoves, chessPosition, validMoves);
                 System.out.print(RESET_BG_COLOR + bgColor + " " + pieceColor + " ");
             }
             System.out.print(SET_BG_COLOR_BLACK + " " + SET_TEXT_COLOR_YELLOW + row + " " + RESET_BG_COLOR + RESET_TEXT_COLOR + "\n");
@@ -73,18 +78,18 @@ public class ChessBoardUI {
      * @param col the current col being drawn
      * @param highlightLegalMoves if we are highlighting moves
      * @param chessPosition the current chessPosition
-     * @param chessGame the current chessGame
+     * @param validMoves the current validMoves
      * @return the string containing the bgColor
      */
     private static String getBgColor(int row, int col, boolean highlightLegalMoves,
-                                     ChessPosition chessPosition, ChessGame chessGame) {
+                                     ChessPosition chessPosition, Collection<ChessMove> validMoves) {
         boolean alternate = (row + col) % 2 == 0;
         String bgColor = alternate ? SET_BG_COLOR_DARK_GREY : SET_BG_COLOR_LIGHT_GREY;
 
         if (!highlightLegalMoves) {
             return bgColor;
         }
-        Collection<ChessMove> validMoves = chessGame.validMoves(chessPosition);
+
         if (chessPosition.getRow() == row && chessPosition.getColumn() == col) {
             return SET_BG_COLOR_YELLOW;
         }

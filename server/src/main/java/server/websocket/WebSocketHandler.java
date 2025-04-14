@@ -4,7 +4,6 @@ import chess.*;
 import com.google.gson.Gson;
 import dataaccess.dao.AuthDAO;
 import dataaccess.dao.GameDAO;
-import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
@@ -122,10 +121,7 @@ public class WebSocketHandler {
                         command.getGameID());
                 connections.connectionByGameIdUsername(gameData.gameID(), username).send(
                         new Gson().toJson(new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
-                                String.format(
-                                        username + " made move " + moveString(command.getMove().getStartPosition())
-                                                + "->" + moveString(command.getMove().getEndPosition())
-                                ))));
+                                "You have them in check")));
             } else if (gameData.game().isInCheckmate(currentTeamTurn)) {
                 gameData.game().setActiveGame(false);
                 gameDAO.update(gameData);
