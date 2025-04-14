@@ -23,7 +23,7 @@ public class InGameClient implements Client {
     private String playerColor = "WHITE";
     private GameData gameData = null;
     private final WebSocketFacade ws;
-    private final ClientState state;
+    private ClientState state;
 
     /**
      * The constructor for the InGameClient, which sets up a connection to the server.
@@ -70,7 +70,7 @@ public class InGameClient implements Client {
             String playerColorType = state == ClientState.OBSERVER ? "OBSERVER" : playerColor;
             ws.leave(authData.authToken(), gameData.gameID(), playerColorType);
             System.out.println(SET_TEXT_COLOR_GREEN + "    " + "You have left the game." + RESET_TEXT_COLOR);
-            return new ClientResult("logout", ClientState.SIGNEDOUT, null);
+            return new ClientResult("logout", ClientState.SIGNEDIN, null);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -99,6 +99,7 @@ public class InGameClient implements Client {
     public ClientResult help() {
         String helpText =
             "    " + SET_TEXT_COLOR_BLUE + "redraw" + RESET_TEXT_COLOR + " - redraws chess board\n" +
+            "    " + SET_TEXT_COLOR_BLUE + "leave" + RESET_TEXT_COLOR + " - leave chess game\n" +
             "    " + SET_TEXT_COLOR_BLUE + "logout" + RESET_TEXT_COLOR + " - when you are done\n" +
             "    " + SET_TEXT_COLOR_BLUE + "help" + RESET_TEXT_COLOR + " - with possible commands\n";
         System.out.print(helpText);
@@ -121,5 +122,9 @@ public class InGameClient implements Client {
      */
     public void setPlayerColor(String playerColor) {
         this.playerColor = playerColor;
+    }
+
+    public void setState(ClientState clientState) {
+        this.state = clientState;
     }
 }

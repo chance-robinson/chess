@@ -28,6 +28,7 @@ public class ChessBoardUI {
         int[] colOrder = isWhite ? new int[]{1,2,3,4,5,6,7,8} : new int[]{8,7,6,5,4,3,2,1};
         char[] colNames = new char[]{'a','b','c','d','e','f','g','h'};
 
+        System.out.println();
         System.out.print(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_YELLOW + "   ");
         for (int col: colOrder) {
             System.out.print(" " + colNames[col-1] + " ");

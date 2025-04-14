@@ -44,7 +44,7 @@ public class PreLoginClient implements Client {
         return switch (cmd) {
             case "login" -> login(params);
             case "register" -> register(params);
-            case "quit" -> new ClientResult("quit", ClientState.SIGNEDOUT, null);
+            case "quit" -> new ClientResult("quit", null, null);
             default -> help();
         };
     }

@@ -94,7 +94,7 @@ public class WebSocketHandler {
 
         connections.broadcast(username,
                 new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
-                String.format(username + " has left as " + command.getPlayerColor())),
+                String.format(username + " has left as " + playerColor)),
                 gameData.gameID());
     }
 

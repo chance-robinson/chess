@@ -132,7 +132,7 @@ public class Repl implements NotificationHandler {
 
     private void loadGame(GameData gameData) {
         String playerColor;
-        if (authData.username().equals(gameData.whiteUsername())) {
+        if (state == ClientState.OBSERVER) {
             playerColor = "WHITE";
         } else if (authData.username().equals(gameData.blackUsername())) {
             playerColor = "BLACK";
@@ -141,6 +141,7 @@ public class Repl implements NotificationHandler {
         }
 
         inGameClient.setPlayerColor(playerColor);
+        inGameClient.setState(state);
         inGameClient.setGameData(gameData);
         inGameClient.eval("REDRAW");
         printPrompt();
