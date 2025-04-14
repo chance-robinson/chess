@@ -1,5 +1,6 @@
 package ui.client;
 
+import chess.*;
 import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
@@ -9,6 +10,8 @@ import ui.client.websocket.WebSocketFacade;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Objects;
+import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
 
@@ -54,6 +57,7 @@ public class InGameClient implements Client {
         var params = Arrays.copyOfRange(tokens, 1, tokens.length);
         return switch (cmd) {
             case "redraw" -> redraw();
+            case "move" -> makeMove(params);
             case "leave" -> leave();
             case "resign" -> resign();
             case "logout" -> logout();
@@ -73,6 +77,91 @@ public class InGameClient implements Client {
     private ClientResult redraw() {
         ChessBoardUI.drawBoard(playerColor);
         return new ClientResult("redraw", null, null);
+    }
+
+    private ClientResult makeMove(String... params) throws IOException {
+        if (params.length == 2) {
+            var startPos = params[0].toLowerCase();
+            var endPos = params[1].toLowerCase();
+            if (!isValidPosition(startPos) || !isValidPosition(endPos)) {
+                System.out.println(SET_TEXT_COLOR_YELLOW + "    Invalid move format. Use positions like 'e2' or 'h7'." + RESET_TEXT_COLOR);
+                return new ClientResult("error", null, null);
+            }
+            int startRow, startCol, endRow, endCol;
+            try {
+                startCol = startPos.charAt(0) - 'a' + 1;
+                startRow = Integer.parseInt(String.valueOf(startPos.charAt(1)));
+                endRow = Integer.parseInt(String.valueOf(endPos.charAt(1)));
+                endCol = endPos.charAt(0) - 'a' + 1;
+                if (startRow < 1 || startRow > 8 || startCol < 1 || startCol > 8
+                        || endRow < 1 || endRow > 8 || endCol < 1 || endCol > 8) {
+                    throw new NumberFormatException();
+                }
+            } catch (NumberFormatException e) {
+                System.out.println(SET_TEXT_COLOR_YELLOW + "    " + "Need <START_POS> and <END_POS> to be within "
+                        + "1-8 for rows and a-h for columns in format <Column,Row> for each position." + RESET_TEXT_COLOR);
+                return new ClientResult("error", null, null);
+            }
+            ChessPosition startPosition = new ChessPosition(startRow, startCol);
+            ChessPosition endPosition = new ChessPosition(endRow, endCol);
+            ChessPiece.PieceType promotionPiece = null;
+            ChessPiece pieceType = gameData.game().getBoard().getPiece(startPosition);
+            ChessPiece.PieceType pieceType1 = pieceType.getPieceType();
+            String teamColor = pieceType.getTeamColor().toString();
+            if (!Objects.equals(teamColor, playerColor)) {
+                System.out.println(SET_TEXT_COLOR_YELLOW + "    Invalid starting position" + RESET_TEXT_COLOR);
+                return new ClientResult("makeMove", null, null);
+            }
+            if ((Objects.equals(teamColor, "WHITE") && endRow == 8 && pieceType1 == ChessPiece.PieceType.PAWN) ||
+                    ((Objects.equals(teamColor, "BLACK") && endRow == 1 && pieceType1 == ChessPiece.PieceType.PAWN))) {
+                while (promotionPiece == null) {
+                    promotionPiece = getPromotionPiece();
+                    System.out.println(SET_TEXT_COLOR_YELLOW + "    Select correct promotion piece");
+                }
+            }
+
+            ChessMove chessMove = new ChessMove(startPosition, endPosition, promotionPiece);
+            if (!gameData.game().validMoves(startPosition).contains(chessMove)) {
+                System.out.println(SET_TEXT_COLOR_YELLOW + "\n    Invalid move" + RESET_TEXT_COLOR);
+                return new ClientResult("makeMove", null, null);
+            }
+            ws.makeMove(authData.authToken(), gameData.gameID(), chessMove);
+            return new ClientResult("makeMove", null, null);
+        }
+        else {
+            System.out.println(SET_TEXT_COLOR_YELLOW + "    " + "Arguments required: move <START_POS> <END_POSITION>" + RESET_TEXT_COLOR);
+            return new ClientResult("error", null, null);
+        }
+    }
+
+    private ChessPiece.PieceType getPromotionPiece() {
+        System.out.println(SET_TEXT_COLOR_BLUE + "    Promotion piece selection available:");
+        System.out.println(SET_TEXT_COLOR_BLUE + "        rook");
+        System.out.println(SET_TEXT_COLOR_BLUE + "        knight");
+        System.out.println(SET_TEXT_COLOR_BLUE + "        bishop");
+        System.out.println(SET_TEXT_COLOR_BLUE + "        queen" + RESET_TEXT_COLOR);
+        Scanner scanner = new Scanner(System.in);
+        String eval = scanner.nextLine();
+        return switch (eval) {
+            case "rook" -> ChessPiece.PieceType.ROOK;
+            case "knight" -> ChessPiece.PieceType.KNIGHT;
+            case "bishop" -> ChessPiece.PieceType.BISHOP;
+            case "queen" -> ChessPiece.PieceType.QUEEN;
+            default -> {
+                System.out.println(SET_TEXT_COLOR_RED + "Select either: \"rook, knight, bishop, or queen\"");
+                yield getPromotionPiece();
+            }
+        };
+    }
+
+    private boolean isValidPosition(String pos) {
+        if (pos.length() != 2) {
+            return false;
+        }
+        char file = pos.charAt(0);
+        char rank = pos.charAt(1);
+
+        return (file >= 'a' && file <= 'h') && (rank >= '1' && rank <= '8');
     }
 
     private ClientResult leave() {
@@ -109,6 +198,8 @@ public class InGameClient implements Client {
     public ClientResult help() {
         String helpText =
             "    " + SET_TEXT_COLOR_BLUE + "redraw" + RESET_TEXT_COLOR + " - redraws chess board\n" +
+            "    " + SET_TEXT_COLOR_BLUE + "move" + RESET_TEXT_COLOR + " - make move using format \"move <START_POS> <END_POS>\"" +
+                    " where each position is in format <Column, Row>\n" +
             "    " + SET_TEXT_COLOR_BLUE + "leave" + RESET_TEXT_COLOR + " - leave chess game\n" +
             "    " + SET_TEXT_COLOR_BLUE + "resign" + RESET_TEXT_COLOR + " - forfeit the game and lose\n" +
             "    " + SET_TEXT_COLOR_BLUE + "logout" + RESET_TEXT_COLOR + " - when you are done\n" +
