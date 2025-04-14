@@ -1,11 +1,16 @@
 package server.websocket;
 
 import com.google.gson.Gson;
+import dataaccess.dao.AuthDAO;
+import dataaccess.dao.GameDAO;
+import model.AuthData;
+import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import websocket.commands.*;
 import websocket.messages.ErrorMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
@@ -15,6 +20,13 @@ import java.io.IOException;
 public class WebSocketHandler {
 
     private final ConnectionManager connections = new ConnectionManager();
+    private final AuthDAO authDAO;
+    private final GameDAO gameDAO;
+
+    public WebSocketHandler(AuthDAO authDAO, GameDAO gameDAO) {
+        this.authDAO = authDAO;
+        this.gameDAO = gameDAO;
+    }
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException {
@@ -22,11 +34,22 @@ public class WebSocketHandler {
             UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
 
             String username = getUsername(command.getAuthToken());
+            if (username == null) {
+                throw new RuntimeException("Error: no user found");
+            }
 
-            connections.add(Integer.toString(command.getGameID()), session);
+            GameData gameData = gameDAO.getGame(command.getGameID());
+            if (gameData == null) {
+                throw new RuntimeException("Error: no game data");
+            }
+
+            connections.add(username, session, command.getGameID());
 
             switch (command.getCommandType()) {
-                case CONNECT -> connect(session, username, (ConnectCommand) command);
+                case CONNECT -> {
+                    ConnectCommand connectCommand = new Gson().fromJson(message, ConnectCommand.class);
+                    connect(username, gameData, connectCommand);
+                }
                 case MAKE_MOVE -> makeMove(session, username, (MakeMoveCommand) command);
                 case LEAVE -> leave(session, username, (LeaveCommand) command);
                 case RESIGN -> resign(session, username, (ResignCommand) command);
@@ -46,10 +69,15 @@ public class WebSocketHandler {
     private void makeMove(Session session, String username, MakeMoveCommand command) {
     }
 
-    private void connect(Session session, String username, ConnectCommand command) {
+    private void connect(String username, GameData gameData, ConnectCommand command) throws IOException {
+        connections.broadcast(username,
+                new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
+                String.format(username + " has connected as " + command.getPlayerColor())),
+                gameData.gameID());
     }
 
     private String getUsername(String authToken) {
-        return "";
+        AuthData authData = authDAO.getAuth(authToken);
+        return authData.username();
     };
 }

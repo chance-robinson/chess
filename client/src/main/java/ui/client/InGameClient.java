@@ -3,7 +3,6 @@ package ui.client;
 import exception.ResponseException;
 import model.GameData;
 import serverfacade.ServerFacade;
-import ui.client.websocket.NotificationHandler;
 import ui.client.websocket.WebSocketFacade;
 
 import java.util.Arrays;
@@ -20,16 +19,16 @@ public class InGameClient implements Client {
     private String authToken;
     private String playerColor = "WHITE";
     private GameData gameData = null;
-    private WebSocketFacade ws;
+    private final WebSocketFacade ws;
 
     /**
      * The constructor for the InGameClient, which sets up a connection to the server.
      *
      * @param serverUrl the specific server url
      */
-    public InGameClient(String serverUrl, NotificationHandler notificationHandler) throws ResponseException {
+    public InGameClient(String serverUrl,  WebSocketFacade ws) {
         serverFacade = new ServerFacade(serverUrl);
-        ws = new WebSocketFacade(serverUrl, notificationHandler);
+        this.ws = ws;
     }
 
     /**

@@ -1,7 +1,7 @@
 import exception.ResponseException;
 import ui.Repl;
 
-public class Main {
+public class ClientMain {
     public static void main(String[] args) throws ResponseException {
         var serverUrl = "http://localhost:8080";
         if (args.length == 1) {

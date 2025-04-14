@@ -4,6 +4,7 @@ import chess.ChessGame;
 import exception.ResponseException;
 import ui.client.*;
 import ui.client.websocket.NotificationHandler;
+import ui.client.websocket.WebSocketFacade;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
@@ -26,6 +27,7 @@ public class Repl implements NotificationHandler {
     private final InGameClient inGameClient;
     private ClientState state = ClientState.SIGNEDOUT;
     private String authToken = null;
+    private WebSocketFacade ws;
 
     /**
      * The constructor of the Repl class to initialize
@@ -34,9 +36,10 @@ public class Repl implements NotificationHandler {
      * @param serverUrl the server url of the chess server
      */
     public Repl(String serverUrl) throws ResponseException {
+        ws = new WebSocketFacade(serverUrl, this);
         preLoginClient = new PreLoginClient(serverUrl);
-        loggedInClient = new LoggedInClient(serverUrl, this);
-        inGameClient = new InGameClient(serverUrl, this);
+        loggedInClient = new LoggedInClient(serverUrl, ws);
+        inGameClient = new InGameClient(serverUrl, ws);
     }
 
     /**
@@ -132,6 +135,9 @@ public class Repl implements NotificationHandler {
     }
 
     private void displayNotification(String notificationMessage) {
+        System.out.println(SET_TEXT_COLOR_BLUE + SET_TEXT_BOLD + "\n    " + notificationMessage
+                + RESET_TEXT_COLOR + RESET_TEXT_BOLD_FAINT);
+        printPrompt();
     }
 
     private void loadGame(ChessGame chessGame) {

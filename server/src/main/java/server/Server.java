@@ -10,6 +10,7 @@ import dataaccess.dao.sql.SQLAuthDAO;
 import dataaccess.dao.sql.SQLGameDAO;
 import dataaccess.dao.sql.SQLUserDAO;
 import handler.*;
+import server.websocket.WebSocketHandler;
 import service.GameService;
 import service.GeneralService;
 import service.UserService;
@@ -22,6 +23,24 @@ import static spark.Spark.*;
  * based on a specific port and location of staticFiles.
  */
 public class Server {
+    private final WebSocketHandler webSocketHandler;
+    private static UserDAO userDAO = null;
+    private static AuthDAO authDAO = null;
+    private static GameDAO gameDAO = null;
+
+    public Server() {
+        boolean useSQL = true;
+        if (useSQL) {
+            userDAO = new SQLUserDAO();
+            authDAO = new SQLAuthDAO();
+            gameDAO = new SQLGameDAO();
+        } else {
+            userDAO = new MemoryUserDAO();
+            authDAO = new MemoryAuthDAO();
+            gameDAO = new MemoryGameDAO();
+        }
+        webSocketHandler = new WebSocketHandler(authDAO, gameDAO);
+    }
 
     /**
      * Runs the Spark server on a given port
@@ -34,7 +53,7 @@ public class Server {
 
         Spark.staticFiles.location("web");
 
-        Spark.webSocket("/ws", Server.class);
+        Spark.webSocket("/ws", webSocketHandler);
 
         // Register your endpoints and handle exceptions here.
         createRoutes();
@@ -50,20 +69,6 @@ public class Server {
      * Creates the routes on Spark using the dedicated handlers for a specified path
      */
     private static void createRoutes() {
-        UserDAO userDAO;
-        AuthDAO authDAO;
-        GameDAO gameDAO;
-
-        boolean useSQL = true;
-        if (useSQL) {
-            userDAO = new SQLUserDAO();
-            authDAO = new SQLAuthDAO();
-            gameDAO = new SQLGameDAO();
-        } else {
-            userDAO = new MemoryUserDAO();
-            authDAO = new MemoryAuthDAO();
-            gameDAO = new MemoryGameDAO();
-        }
         UserService userService = new UserService(userDAO, authDAO);
         GameService gameService = new GameService(gameDAO, authDAO);
         GeneralService generalService = new GeneralService(userDAO, gameDAO, authDAO);

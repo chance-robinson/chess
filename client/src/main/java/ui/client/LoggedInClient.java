@@ -6,9 +6,9 @@ import serverfacade.ServerFacade;
 import server.net.request.CreateGameRequest;
 import server.net.request.JoinGameRequest;
 import server.net.result.ListGamesResult;
-import ui.client.websocket.NotificationHandler;
 import ui.client.websocket.WebSocketFacade;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -23,16 +23,16 @@ public class LoggedInClient implements Client {
     private static ServerFacade serverFacade;
     private String authToken = null;
     private ArrayList<GameData> listGames = new ArrayList<>();
-    private WebSocketFacade ws;
+    private final WebSocketFacade ws;
 
     /**
      * The constructor for the PreLoginClient, which sets up a connection to the server.
      *
      * @param serverUrl the specific server url
      */
-    public LoggedInClient(String serverUrl, NotificationHandler notificationHandler) throws ResponseException {
+    public LoggedInClient(String serverUrl, WebSocketFacade ws) {
         serverFacade = new ServerFacade(serverUrl);
-        ws = new WebSocketFacade(serverUrl, notificationHandler);
+        this.ws = ws;
     }
 
     /**
@@ -144,13 +144,15 @@ public class LoggedInClient implements Client {
                 var gameID = listGames.get(Integer.parseInt(params[0])-1).gameID();
                 JoinGameRequest joinGameRequest = new JoinGameRequest("observe", gameID);
                 serverFacade.joinGame(joinGameRequest, authToken);
+                ws.connect(authToken, gameID, "observer");
                 return new ClientResult("observe", ClientState.OBSERVER, null);
             } catch (NumberFormatException | IndexOutOfBoundsException e) {
                 System.out.printf(SET_TEXT_COLOR_YELLOW + "    " + "Error: <ID> must be of type Integer, greater than 0, " +
                         "and must be in the list of games.\n" + RESET_TEXT_COLOR);
                 return new ClientResult("error", null, null);
-            } catch (ResponseException e) {
-                return handleError(e);
+            } catch (ResponseException | IOException e) {
+                assert e instanceof ResponseException;
+                return handleError((ResponseException) e);
             }
         } else {
             System.out.println(SET_TEXT_COLOR_YELLOW + "    " + "Arguments required: observe <ID>" + RESET_TEXT_COLOR);
