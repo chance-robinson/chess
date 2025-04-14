@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessGame;
 import exception.ResponseException;
 import ui.client.*;
 import ui.client.websocket.NotificationHandler;
@@ -121,7 +122,7 @@ public class Repl implements NotificationHandler {
 
     public void notify(ServerMessage message) {
         switch (message.getServerMessageType()) {
-            case LOAD_GAME -> loadGame(((LoadGameMessage) message).getLoadGameMessage());
+            case LOAD_GAME -> loadGame(((LoadGameMessage) message).getChessGame());
             case NOTIFICATION -> displayNotification(((NotificationMessage) message).getNotificationMessage());
             case ERROR -> displayError(((ErrorMessage) message).getErrorMessage());
         }
@@ -133,6 +134,6 @@ public class Repl implements NotificationHandler {
     private void displayNotification(String notificationMessage) {
     }
 
-    private void loadGame(String loadGameMessage) {
+    private void loadGame(ChessGame chessGame) {
     }
 }
