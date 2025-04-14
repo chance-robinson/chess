@@ -10,6 +10,7 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import websocket.commands.*;
 import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
@@ -105,6 +106,9 @@ public class WebSocketHandler {
                 new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
                 String.format(username + " has connected as " + command.getPlayerColor())),
                 gameData.gameID());
+        connections.connectionByGameIdUsername(gameData.gameID(), username).send(
+                new Gson().toJson(new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData))
+        );
     }
 
     private String getUsername(String authToken) {

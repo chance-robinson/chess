@@ -1,7 +1,8 @@
 package ui;
 
-import chess.ChessGame;
 import exception.ResponseException;
+import model.AuthData;
+import model.GameData;
 import ui.client.*;
 import ui.client.websocket.NotificationHandler;
 import ui.client.websocket.WebSocketFacade;
@@ -10,8 +11,6 @@ import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
-import java.util.List;
-import java.util.Objects;
 import java.util.Scanner;
 
 import static java.lang.System.exit;
@@ -26,7 +25,7 @@ public class Repl implements NotificationHandler {
     private final LoggedInClient loggedInClient;
     private final InGameClient inGameClient;
     private ClientState state = ClientState.SIGNEDOUT;
-    private String authToken = null;
+    private AuthData authData = null;
     private WebSocketFacade ws;
 
     /**
@@ -61,24 +60,12 @@ public class Repl implements NotificationHandler {
                 if (clientResult.updatedState() != null && state != clientResult.updatedState()) {
                     state = clientResult.updatedState();
                     if (clientResult.updatedState() != ClientState.SIGNEDOUT && clientResult.authToken() != null) {
-                        authToken = clientResult.authToken();
+                        authData = preLoginClient.getAuthData();
                     } else if (clientResult.updatedState() == ClientState.SIGNEDOUT) {
-                        authToken = null;
+                        authData = null;
                     }
-                    loggedInClient.setAuthToken(authToken);
-                    inGameClient.setAuthToken(authToken);
-                }
-                if ("join:black".equalsIgnoreCase(result)) {
-                    inGameClient.setPlayerColor("BLACK");
-                } else {
-                    inGameClient.setPlayerColor("WHITE");
-                }
-                if (getCurrentClient() instanceof InGameClient && !List.of("help", "logout", "quit").contains(result)) {
-                    if (Objects.equals(result, "observe")) {
-                        ChessBoardUI.drawBoard("WHITE");
-                    } else {
-                        ChessBoardUI.drawBoard(inGameClient.getPlayerColor());
-                    }
+                    loggedInClient.setAuthData(authData);
+                    inGameClient.setAuthData(authData);
                 }
             } catch (Throwable e) {
                 System.out.printf(SET_TEXT_COLOR_RED + "    Error has occurred with the previous command.\n" + RESET_TEXT_COLOR);
@@ -125,7 +112,7 @@ public class Repl implements NotificationHandler {
 
     public void notify(ServerMessage message) {
         switch (message.getServerMessageType()) {
-            case LOAD_GAME -> loadGame(((LoadGameMessage) message).getChessGame());
+            case LOAD_GAME -> loadGame(((LoadGameMessage) message).getGameData());
             case NOTIFICATION -> displayNotification(((NotificationMessage) message).getNotificationMessage());
             case ERROR -> displayError(((ErrorMessage) message).getErrorMessage());
         }
@@ -143,6 +130,19 @@ public class Repl implements NotificationHandler {
         printPrompt();
     }
 
-    private void loadGame(ChessGame chessGame) {
+    private void loadGame(GameData gameData) {
+        String playerColor;
+        if (authData.username().equals(gameData.whiteUsername())) {
+            playerColor = "WHITE";
+        } else if (authData.username().equals(gameData.blackUsername())) {
+            playerColor = "BLACK";
+        } else {
+            playerColor = "WHITE";
+        }
+
+        inGameClient.setPlayerColor(playerColor);
+        inGameClient.setGameData(gameData);
+        inGameClient.eval("REDRAW");
+        printPrompt();
     }
 }

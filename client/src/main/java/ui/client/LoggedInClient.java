@@ -1,6 +1,7 @@
 package ui.client;
 
 import exception.ResponseException;
+import model.AuthData;
 import model.GameData;
 import serverfacade.ServerFacade;
 import server.net.request.CreateGameRequest;
@@ -21,7 +22,7 @@ import static ui.EscapeSequences.*;
  */
 public class LoggedInClient implements Client {
     private static ServerFacade serverFacade;
-    private String authToken = null;
+    private AuthData authData = null;
     private ArrayList<GameData> listGames = new ArrayList<>();
     private final WebSocketFacade ws;
 
@@ -65,7 +66,7 @@ public class LoggedInClient implements Client {
      */
     public ClientResult logout() {
         try {
-            serverFacade.logout(authToken);
+            serverFacade.logout(authData.authToken());
             return new ClientResult("logout", ClientState.SIGNEDOUT, null);
         } catch (ResponseException e) {
             return handleError(e);
@@ -84,7 +85,7 @@ public class LoggedInClient implements Client {
             try {
                 var gameName = params[0];
                 CreateGameRequest createGameRequest = new CreateGameRequest(gameName);
-                serverFacade.createGame(createGameRequest, authToken);
+                serverFacade.createGame(createGameRequest, authData.authToken());
                 System.out.printf("    " + SET_TEXT_COLOR_GREEN + "Game successfully created with GameName: "
                         + RESET_TEXT_COLOR + "%s\n", createGameRequest.gameName());
                 return new ClientResult("create", null, null);
@@ -115,8 +116,8 @@ public class LoggedInClient implements Client {
                     return new ClientResult("error", null, null);
                 }
                 JoinGameRequest joinGameRequest = new JoinGameRequest(playerColor, gameID);
-                serverFacade.joinGame(joinGameRequest, authToken);
-                ws.connect(authToken, gameID, playerColor);
+                serverFacade.joinGame(joinGameRequest, authData.authToken());
+                ws.connect(authData.authToken(), gameID, playerColor);
                 return new ClientResult(String.format("join:%s",playerColor), ClientState.INGAME, null);
             } catch (NumberFormatException | IndexOutOfBoundsException e) {
                 System.out.printf(SET_TEXT_COLOR_YELLOW + "    Error: <ID> must be of type Integer, greater than 0, " +
@@ -145,8 +146,8 @@ public class LoggedInClient implements Client {
             try {
                 var gameID = listGames.get(Integer.parseInt(params[0])-1).gameID();
                 JoinGameRequest joinGameRequest = new JoinGameRequest("observe", gameID);
-                serverFacade.joinGame(joinGameRequest, authToken);
-                ws.connect(authToken, gameID, "observer");
+                serverFacade.joinGame(joinGameRequest, authData.authToken());
+                ws.connect(authData.authToken(), gameID, "observer");
                 return new ClientResult("observe", ClientState.OBSERVER, null);
             } catch (NumberFormatException | IndexOutOfBoundsException e) {
                 System.out.printf(SET_TEXT_COLOR_YELLOW + "    " + "Error: <ID> must be of type Integer, greater than 0, " +
@@ -170,7 +171,7 @@ public class LoggedInClient implements Client {
      */
     public ClientResult listGames() {
         try {
-            ListGamesResult listGamesResult = serverFacade.listGames(authToken);
+            ListGamesResult listGamesResult = serverFacade.listGames(authData.authToken());
             ArrayList<GameData> games = listGamesResult.games();
             games.sort(Comparator.comparingInt(GameData::gameID));
             listGames = games;
@@ -232,9 +233,9 @@ public class LoggedInClient implements Client {
     /**
      * Sets the authToken on the LoggedInClient to be used in the client requests.
      *
-     * @param token the authToken
+     * @param authData the authData
      */
-    public void setAuthToken(String token) {
-        this.authToken = token;
+    public void setAuthData(AuthData authData) {
+        this.authData = authData;
     }
 }

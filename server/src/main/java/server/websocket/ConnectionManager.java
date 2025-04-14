@@ -28,6 +28,14 @@ public class ConnectionManager {
         }
     }
 
+    public Connection connectionByGameIdUsername(int gameID, String username) {
+        var gameIdConnection = connections.get(gameID);
+        if (gameIdConnection == null || gameIdConnection.get(username) == null) {
+            return null;
+        }
+        return gameIdConnection.get(username);
+    }
+
     public void broadcast(String excludeVisitorName, ServerMessage notification, int gameId) throws IOException {
         var gameIdConnection = connections.get(gameId);
         if (gameIdConnection == null) {

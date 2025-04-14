@@ -1,8 +1,10 @@
 package ui.client;
 
 import exception.ResponseException;
+import model.AuthData;
 import model.GameData;
 import serverfacade.ServerFacade;
+import ui.ChessBoardUI;
 import ui.client.websocket.WebSocketFacade;
 
 import java.io.IOException;
@@ -17,11 +19,11 @@ import static ui.EscapeSequences.*;
  */
 public class InGameClient implements Client {
     private static ServerFacade serverFacade;
-    private String authToken;
+    private AuthData authData;
     private String playerColor = "WHITE";
     private GameData gameData = null;
     private final WebSocketFacade ws;
-    private ClientState state;
+    private final ClientState state;
 
     /**
      * The constructor for the InGameClient, which sets up a connection to the server.
@@ -32,6 +34,10 @@ public class InGameClient implements Client {
         serverFacade = new ServerFacade(serverUrl);
         this.ws = ws;
         this.state = state;
+    }
+
+    public void setGameData(GameData gameData) {
+        this.gameData = gameData;
     }
 
     /**
@@ -47,17 +53,22 @@ public class InGameClient implements Client {
         var cmd = (tokens.length > 0) ? tokens[0] : "help";
         var params = Arrays.copyOfRange(tokens, 1, tokens.length);
         return switch (cmd) {
-            case "redraw" -> new ClientResult("redraw", null, null);
+            case "redraw" -> redraw();
             case "leave" -> leave();
             case "logout" -> logout();
             default -> help();
         };
     }
 
+    private ClientResult redraw() {
+        ChessBoardUI.drawBoard(playerColor);
+        return new ClientResult("redraw", null, null);
+    }
+
     private ClientResult leave() {
         try {
             String playerColorType = state == ClientState.OBSERVER ? "OBSERVER" : playerColor;
-            ws.leave(authToken, gameData.gameID(), playerColorType);
+            ws.leave(authData.authToken(), gameData.gameID(), playerColorType);
             System.out.println(SET_TEXT_COLOR_GREEN + "    " + "You have left the game." + RESET_TEXT_COLOR);
             return new ClientResult("logout", ClientState.SIGNEDOUT, null);
         } catch (IOException e) {
@@ -73,7 +84,7 @@ public class InGameClient implements Client {
      */
     public ClientResult logout() {
         try {
-            serverFacade.logout(authToken);
+            serverFacade.logout(authData.authToken());
             return new ClientResult("logout", ClientState.SIGNEDOUT, null);
         } catch (ResponseException e) {
             return handleError(e);
@@ -97,10 +108,10 @@ public class InGameClient implements Client {
     /**
      * Sets the authToken on the LoggedInClient to be used in the client requests.
      *
-     * @param token the authToken
+     * @param authData the authData
      */
-    public void setAuthToken(String token) {
-        this.authToken = token;
+    public void setAuthData(AuthData authData) {
+        this.authData = authData;
     }
 
     /**
@@ -110,13 +121,5 @@ public class InGameClient implements Client {
      */
     public void setPlayerColor(String playerColor) {
         this.playerColor = playerColor;
-    }
-    /**
-     * Returns the playerColor of the user from the InGameClient.
-     *
-     * @return the playerColor
-     */
-    public String getPlayerColor() {
-        return playerColor;
     }
 }

@@ -1,6 +1,7 @@
 package ui.client;
 
 import exception.ResponseException;
+import model.AuthData;
 import serverfacade.ServerFacade;
 import server.net.request.LoginRequest;
 import server.net.request.RegisterRequest;
@@ -17,6 +18,7 @@ import static ui.EscapeSequences.*;
  */
 public class PreLoginClient implements Client {
     private static ServerFacade serverFacade;
+    private AuthData authData;
 
     /**
      * The constructor for the PreLoginClient, which sets up a connection to the server.
@@ -76,6 +78,7 @@ public class PreLoginClient implements Client {
                 var password = params[1];
                 LoginRequest loginRequest = new LoginRequest(username, password);
                 LoginResult loginResult = serverFacade.login(loginRequest);
+                this.authData = new AuthData(loginResult.authToken(), loginResult.username());
                 System.out.printf("    " + SET_TEXT_COLOR_GREEN + "You have logged in as: " + RESET_TEXT_COLOR + "%s\n", loginResult.username());
                 return new ClientResult("login", ClientState.SIGNEDIN, loginResult.authToken());
             } catch (ResponseException e) {
@@ -102,6 +105,7 @@ public class PreLoginClient implements Client {
                 var email = params[2];
                 RegisterRequest registerRequest = new RegisterRequest(username, password, email);
                 RegisterResult registerResult = serverFacade.register(registerRequest);
+                this.authData = new AuthData(registerResult.authToken(), registerRequest.username());
                 return new ClientResult("register", ClientState.SIGNEDIN, registerResult.authToken());
             } catch (ResponseException e) {
                 return handleError(e);
@@ -111,5 +115,9 @@ public class PreLoginClient implements Client {
                     + RESET_TEXT_COLOR);
             return new ClientResult("error", null, null);
         }
+    }
+
+    public AuthData getAuthData() {
+        return authData;
     }
 }
