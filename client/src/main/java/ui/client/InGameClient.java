@@ -79,7 +79,17 @@ public class InGameClient implements Client {
      */
     private ClientResult resign() throws IOException {
         if (this.state == ClientState.INGAME) {
-            ws.resign(authData.authToken(), gameData.gameID());
+            Scanner scanner = new Scanner(System.in);
+            System.out.println(SET_TEXT_COLOR_BLUE + "    ARE YOU SURE YOU WANT TO RESIGN? Enter [YES|NO]" + RESET_TEXT_COLOR);
+            System.out.print("[RESIGN_CONFIRMATION] >>> ");
+            String eval = scanner.nextLine().toLowerCase();
+            if (eval.equals("yes")) {
+                ws.resign(authData.authToken(), gameData.gameID());
+            } else if (eval.equals("no")) {
+                System.out.println(SET_TEXT_COLOR_BLUE + "    Resign has been cancelled." + RESET_TEXT_COLOR);
+            } else {
+                System.out.println(SET_TEXT_COLOR_YELLOW + "    Bad input detected. Try resigning again." + RESET_TEXT_COLOR);
+            }
         } else {
             System.out.println(SET_TEXT_COLOR_YELLOW + "    " + "Only a player can resign." + RESET_TEXT_COLOR);
         }

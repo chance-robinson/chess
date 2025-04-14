@@ -103,6 +103,8 @@ public class WebSocketHandler {
         if (validMove) {
             gameData.game().makeMove(command.getMove());
             currentTeamTurn = gameData.game().getTeamTurn();
+            String currentUser = currentTeamTurn ==
+                    ChessGame.TeamColor.WHITE ? gameData.whiteUsername() : gameData.blackUsername();
             gameDAO.update(gameData);
             connections.broadcast(username,
                     new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
@@ -117,31 +119,31 @@ public class WebSocketHandler {
                 ) {
                 connections.broadcast(username,
                         new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
-                                String.format(currentTeamTurn + " is in check")),
+                                String.format(currentUser + " is in check")),
                         command.getGameID());
                 connections.connectionByGameIdUsername(gameData.gameID(), username).send(
                         new Gson().toJson(new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
-                                "You have them in check")));
+                                "You have put " + currentUser + " in check")));
+            } else if (gameData.game().isInStalemate(currentTeamTurn)) {
+                gameData.game().setActiveGame(false);
+                gameDAO.update(gameData);
+                connections.broadcast(username,
+                        new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
+                                currentUser + " has been put in stalemate"),
+                        command.getGameID());
+                connections.connectionByGameIdUsername(gameData.gameID(), username).send(
+                        new Gson().toJson(new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
+                                "You have put " + currentUser + " in stalemate")));
             } else if (gameData.game().isInCheckmate(currentTeamTurn)) {
                 gameData.game().setActiveGame(false);
                 gameDAO.update(gameData);
                 connections.broadcast(username,
                         new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
-                               "Game has ended in stalemate"),
+                                String.format(currentUser + " was checkmated")),
                         command.getGameID());
                 connections.connectionByGameIdUsername(gameData.gameID(), username).send(
                         new Gson().toJson(new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
-                                "Game has ended in stalemate")));
-            } else if (gameData.game().isInCheckmate(currentTeamTurn)) {
-                gameData.game().setActiveGame(false);
-                gameDAO.update(gameData);
-                connections.broadcast(username,
-                        new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
-                                String.format(username + " is now in checkmate")),
-                        command.getGameID());
-                connections.connectionByGameIdUsername(gameData.gameID(), username).send(
-                        new Gson().toJson(new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
-                                username + " is now in checkmate")));
+                                "You have checkmated " + currentUser)));
             }
             connections.broadcast(username,
                     new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData),

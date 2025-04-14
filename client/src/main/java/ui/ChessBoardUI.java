@@ -86,7 +86,10 @@ public class ChessBoardUI {
         boolean alternate = (row + col) % 2 == 0;
         String bgColor = alternate ? SET_BG_COLOR_DARK_GREY : SET_BG_COLOR_LIGHT_GREY;
 
-        if (!highlightLegalMoves) {
+        if (!highlightLegalMoves ) {
+            return bgColor;
+        }
+        if (validMoves == null) {
             return bgColor;
         }
 
