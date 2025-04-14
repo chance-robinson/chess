@@ -1,9 +1,8 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
+
+import java.util.Collection;
 
 import static ui.EscapeSequences.*;
 
@@ -28,7 +27,7 @@ public class ChessBoardUI {
      *
      * @param playerColor the playerColor to base render off of.
      */
-    public static void drawBoard(String playerColor, ChessGame chessGame) {
+    public static void drawBoard(String playerColor, ChessGame chessGame, boolean highlightLegalMoves, ChessPosition chessPosition) {
         boolean isWhite = !playerColor.equals("BLACK");
         int[] rowOrder = isWhite ? new int[]{8,7,6,5,4,3,2,1} : new int[]{1,2,3,4,5,6,7,8};
         int[] colOrder = isWhite ? new int[]{1,2,3,4,5,6,7,8} : new int[]{8,7,6,5,4,3,2,1};
@@ -52,7 +51,24 @@ public class ChessBoardUI {
                 String pieceColor = getPieceColor(piece);
 
                 boolean alternate = (row + col) % 2 == 0;
-                String bgColor = alternate ? SET_BG_COLOR_LIGHT_GREY : SET_BG_COLOR_GREEN;
+                String bgColor = alternate ? SET_BG_COLOR_DARK_GREY : SET_BG_COLOR_LIGHT_GREY;
+                if (highlightLegalMoves) {
+                    Collection<ChessMove> validMoves = chessGame.validMoves(chessPosition);
+                    boolean isLegal = false;
+                    if (chessPosition.getRow() == row && chessPosition.getColumn() == col) {
+                        bgColor = SET_BG_COLOR_YELLOW;
+                    } else {
+                        for (ChessMove move : validMoves) {
+                            if (move.getEndPosition().getRow() == row && move.getEndPosition().getColumn() == col) {
+                                isLegal = true;
+                                break;
+                            }
+                        }
+                        if (isLegal) {
+                            bgColor = SET_BG_COLOR_LIGHT_YELLOW;
+                        }
+                    }
+                }
                 System.out.print(RESET_BG_COLOR + bgColor + " " + pieceColor + " ");
             }
             System.out.print(SET_BG_COLOR_BLACK + " " + SET_TEXT_COLOR_YELLOW + row + " " + RESET_BG_COLOR + RESET_TEXT_COLOR + "\n");

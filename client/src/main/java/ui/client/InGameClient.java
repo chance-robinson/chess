@@ -56,7 +56,8 @@ public class InGameClient implements Client {
         var cmd = (tokens.length > 0) ? tokens[0] : "help";
         var params = Arrays.copyOfRange(tokens, 1, tokens.length);
         return switch (cmd) {
-            case "redraw" -> redraw();
+            case "redraw" -> redraw(false, null);
+            case "highlight" -> highlightLegalMoves(params);
             case "move" -> makeMove(params);
             case "leave" -> leave();
             case "resign" -> resign();
@@ -74,9 +75,39 @@ public class InGameClient implements Client {
         return new ClientResult("resign", null, null);
     }
 
-    private ClientResult redraw() {
-        ChessBoardUI.drawBoard(playerColor, gameData.game());
+    private ClientResult redraw(boolean highlightLegalMoves, ChessPosition chessPosition) {
+        ChessBoardUI.drawBoard(playerColor, gameData.game(), highlightLegalMoves, chessPosition);
         return new ClientResult("redraw", null, null);
+    }
+
+    private ClientResult highlightLegalMoves(String... params) throws IOException {
+        if (params.length == 1) {
+            var curPos = params[0].toLowerCase();
+            if (!isValidPosition(curPos)) {
+                System.out.println(SET_TEXT_COLOR_YELLOW + "    Invalid move format. Use positions like 'e2' or 'h7'." + RESET_TEXT_COLOR);
+                return new ClientResult("error", null, null);
+            }
+            int curRow, curCol;
+            try {
+                curCol = curPos.charAt(0) - 'a' + 1;
+                curRow = Integer.parseInt(String.valueOf(curPos.charAt(1)));
+                if (curRow < 1 || curRow > 8 || curCol < 1 || curCol > 8) {
+                    throw new NumberFormatException();
+                }
+            } catch (NumberFormatException e) {
+                System.out.println(SET_TEXT_COLOR_YELLOW + "    " + "Need <CUR_POS> to be within"
+                        + "1-8 for rows and a-h for columns in format <Column,Row> for each position." + RESET_TEXT_COLOR);
+                return new ClientResult("error", null, null);
+            }
+
+            ChessPosition curPosition = new ChessPosition(curRow, curCol);
+            redraw(true, curPosition);
+            return new ClientResult("highlight", null, null);
+        }
+        else {
+            System.out.println(SET_TEXT_COLOR_YELLOW + "    " + "Arguments required: move <START_POS> <END_POSITION>" + RESET_TEXT_COLOR);
+            return new ClientResult("error", null, null);
+        }
     }
 
     private ClientResult makeMove(String... params) throws IOException {
@@ -198,6 +229,8 @@ public class InGameClient implements Client {
     public ClientResult help() {
         String helpText =
             "    " + SET_TEXT_COLOR_BLUE + "redraw" + RESET_TEXT_COLOR + " - redraws chess board\n" +
+            "    " + SET_TEXT_COLOR_BLUE + "highlight" + RESET_TEXT_COLOR + " - highlight all moves for a position " +
+                    "using format \"highlight <CUR_POS> where the position is in format <Column, Row>\n" +
             "    " + SET_TEXT_COLOR_BLUE + "move" + RESET_TEXT_COLOR + " - make move using format \"move <START_POS> <END_POS>\"" +
                     " where each position is in format <Column, Row>\n" +
             "    " + SET_TEXT_COLOR_BLUE + "leave" + RESET_TEXT_COLOR + " - leave chess game\n" +
