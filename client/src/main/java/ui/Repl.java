@@ -26,7 +26,6 @@ public class Repl implements NotificationHandler {
     private final InGameClient inGameClient;
     private ClientState state = ClientState.SIGNEDOUT;
     private AuthData authData = null;
-    private WebSocketFacade ws;
 
     /**
      * The constructor of the Repl class to initialize
@@ -35,7 +34,7 @@ public class Repl implements NotificationHandler {
      * @param serverUrl the server url of the chess server
      */
     public Repl(String serverUrl) throws ResponseException {
-        ws = new WebSocketFacade(serverUrl, this);
+        WebSocketFacade ws = new WebSocketFacade(serverUrl, this);
         preLoginClient = new PreLoginClient(serverUrl);
         loggedInClient = new LoggedInClient(serverUrl, ws);
         inGameClient = new InGameClient(serverUrl, ws, state);
@@ -113,7 +112,7 @@ public class Repl implements NotificationHandler {
     public void notify(ServerMessage message) {
         switch (message.getServerMessageType()) {
             case LOAD_GAME -> loadGame(((LoadGameMessage) message).getGameData());
-            case NOTIFICATION -> displayNotification(((NotificationMessage) message).getNotificationMessage());
+            case NOTIFICATION -> displayNotification(((NotificationMessage) message).getMessage());
             case ERROR -> displayError(((ErrorMessage) message).getErrorMessage());
         }
     }
