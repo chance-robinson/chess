@@ -11,6 +11,7 @@ public class ChessGame {
     private ChessBoard board;
     private ChessBoard simulatedBoard;
     private TeamColor currentTeam = TeamColor.WHITE;
+    private boolean isActiveGame = true;
     public ChessGame() {
         this.board = new ChessBoard();
         this.board.resetBoard();
@@ -57,6 +58,14 @@ public class ChessGame {
      */
     public void setTeamTurn(TeamColor team) {
         currentTeam = team;
+    }
+
+    public boolean isActiveGame() {
+        return isActiveGame;
+    }
+
+    public void setActiveGame(boolean isActiveGame) {
+        this.isActiveGame = isActiveGame;
     }
 
     /**

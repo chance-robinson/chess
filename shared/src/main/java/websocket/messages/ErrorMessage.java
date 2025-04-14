@@ -9,6 +9,6 @@ public class ErrorMessage extends ServerMessage {
     }
 
     public String getErrorMessage() {
-        return String.format(errorMessage);
+        return errorMessage;
     }
 }

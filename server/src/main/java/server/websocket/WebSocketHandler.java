@@ -3,6 +3,7 @@ package server.websocket;
 import com.google.gson.Gson;
 import dataaccess.dao.AuthDAO;
 import dataaccess.dao.GameDAO;
+import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
@@ -55,9 +56,12 @@ public class WebSocketHandler {
                 case MAKE_MOVE -> makeMove(session, username, (MakeMoveCommand) command);
                 case LEAVE -> {
                     LeaveCommand leaveCommand = new Gson().fromJson(message, LeaveCommand.class);
-                    leave(session, username, leaveCommand, gameData);
+                    leave(username, leaveCommand, gameData);
                 }
-                case RESIGN -> resign(session, username, (ResignCommand) command);
+                case RESIGN -> {
+                    ResignCommand resignCommand = new Gson().fromJson(message, ResignCommand.class);
+                    resign(username, resignCommand, gameData);
+                }
             }
         } catch (Exception e) {
             session.getRemote().sendString(new Gson().toJson(new ErrorMessage(ServerMessage.ServerMessageType.ERROR,
@@ -65,12 +69,32 @@ public class WebSocketHandler {
         }
     }
 
-    private void resign(Session session, String username, ResignCommand command) {
+    private void resign(String username, ResignCommand command, GameData gameData) throws IOException {
+        if (!gameData.game().isActiveGame()) {
+            connections.connectionByGameIdUsername(gameData.gameID(), username).send(
+                    new Gson().toJson(new ErrorMessage(ServerMessage.ServerMessageType.ERROR,
+                            "Game has already finished.")));
+            return;
+        }
+        if (Objects.equals(username, gameData.whiteUsername()) || Objects.equals(username, gameData.blackUsername())) {
+            gameData.game().setActiveGame(false);
+            gameDAO.update(gameData);
+            connections.broadcast(username,
+                    new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, String.format(username + " has resigned")),
+                    command.getGameID());
+            connections.connectionByGameIdUsername(gameData.gameID(), username).send(
+                    new Gson().toJson(new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
+                            "You have successfully resigned the chess game.")));
+        } else {
+            connections.connectionByGameIdUsername(gameData.gameID(), username).send(
+                    new Gson().toJson(new ErrorMessage(ServerMessage.ServerMessageType.ERROR,
+                            "You need to be a player to resign.")));
+        }
     }
 
-    private void leave(Session session, String username, LeaveCommand command, GameData gameData) throws IOException {
+    private void leave(String username, LeaveCommand command, GameData gameData) throws IOException, ResponseException {
         String playerColor = command.getPlayerColor();
-        if (Objects.equals(playerColor, "WHITE") && Objects.equals(username, gameData.whiteUsername())) {
+        if (Objects.equals(username, gameData.whiteUsername())) {
             GameData newGameData = new GameData(
                     gameData.gameID(),
                     null,
@@ -79,7 +103,7 @@ public class WebSocketHandler {
                     gameData.game()
             );
             gameDAO.update(newGameData);
-        } else if (Objects.equals(playerColor, "BLACK") && Objects.equals(username, gameData.blackUsername())) {
+        } else if (Objects.equals(username, gameData.blackUsername())) {
             GameData newGameData = new GameData(
                     gameData.gameID(),
                     gameData.whiteUsername(),

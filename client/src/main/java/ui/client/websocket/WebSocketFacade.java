@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import exception.ResponseException;
 import websocket.commands.ConnectCommand;
 import websocket.commands.LeaveCommand;
+import websocket.commands.ResignCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
@@ -37,16 +38,32 @@ public class WebSocketFacade extends Endpoint {
 
                     switch (notification.getServerMessageType()) {
                         case LOAD_GAME:
-                            notificationHandler.notify(new Gson().fromJson(message, LoadGameMessage.class));
+                            try {
+                                notificationHandler.notify(new Gson().fromJson(message, LoadGameMessage.class));
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
                             break;
                         case NOTIFICATION:
-                            notificationHandler.notify(new Gson().fromJson(message, NotificationMessage.class));
+                            try {
+                                notificationHandler.notify(new Gson().fromJson(message, NotificationMessage.class));
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
                             break;
                         case ERROR:
-                            notificationHandler.notify(new Gson().fromJson(message, ErrorMessage.class));
+                            try {
+                                notificationHandler.notify(new Gson().fromJson(message, ErrorMessage.class));
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
                             break;
                         default:
-                            notificationHandler.notify(notification);
+                            try {
+                                notificationHandler.notify(notification);
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
                             break;
                     }
                 }
@@ -69,6 +86,11 @@ public class WebSocketFacade extends Endpoint {
     public void leave(String authToken, int gameID, String playerColor) throws IOException {
         LeaveCommand command = new LeaveCommand(UserGameCommand.CommandType.LEAVE,
                 authToken, gameID, playerColor.toUpperCase());
+        this.session.getBasicRemote().sendText(new Gson().toJson(command));
+    }
+
+    public void resign(String authToken, int gameID) throws IOException {
+        ResignCommand command = new ResignCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID);
         this.session.getBasicRemote().sendText(new Gson().toJson(command));
     }
 }

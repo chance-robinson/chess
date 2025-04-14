@@ -2,13 +2,15 @@ package ui.client;
 
 import exception.ResponseException;
 
+import java.io.IOException;
+
 import static ui.EscapeSequences.*;
 
 /**
  * The interface which all of the 3 clients: InGame, LoggedIn, and PreLogin are implementing.
  */
 public interface Client {
-    ClientResult eval(String input) throws ResponseException;
+    ClientResult eval(String input) throws ResponseException, IOException;
 
     /**
      * This handles the printing on the terminal for when an error occurs.

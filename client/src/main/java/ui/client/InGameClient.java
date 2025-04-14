@@ -48,16 +48,26 @@ public class InGameClient implements Client {
      * and the authToken if received by a response result.
      */
     @Override
-    public ClientResult eval(String input) {
+    public ClientResult eval(String input) throws IOException {
         var tokens = input.toLowerCase().split(" ");
         var cmd = (tokens.length > 0) ? tokens[0] : "help";
         var params = Arrays.copyOfRange(tokens, 1, tokens.length);
         return switch (cmd) {
             case "redraw" -> redraw();
             case "leave" -> leave();
+            case "resign" -> resign();
             case "logout" -> logout();
             default -> help();
         };
+    }
+
+    private ClientResult resign() throws IOException {
+        if (this.state == ClientState.INGAME) {
+            ws.resign(authData.authToken(), gameData.gameID());
+        } else {
+            System.out.println(SET_TEXT_COLOR_YELLOW + "    " + "Only a player can resign." + RESET_TEXT_COLOR);
+        }
+        return new ClientResult("resign", null, null);
     }
 
     private ClientResult redraw() {
@@ -100,6 +110,7 @@ public class InGameClient implements Client {
         String helpText =
             "    " + SET_TEXT_COLOR_BLUE + "redraw" + RESET_TEXT_COLOR + " - redraws chess board\n" +
             "    " + SET_TEXT_COLOR_BLUE + "leave" + RESET_TEXT_COLOR + " - leave chess game\n" +
+            "    " + SET_TEXT_COLOR_BLUE + "resign" + RESET_TEXT_COLOR + " - forfeit the game and lose\n" +
             "    " + SET_TEXT_COLOR_BLUE + "logout" + RESET_TEXT_COLOR + " - when you are done\n" +
             "    " + SET_TEXT_COLOR_BLUE + "help" + RESET_TEXT_COLOR + " - with possible commands\n";
         System.out.print(helpText);

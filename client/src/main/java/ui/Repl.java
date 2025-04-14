@@ -11,6 +11,7 @@ import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
+import java.io.IOException;
 import java.util.Scanner;
 
 import static java.lang.System.exit;
@@ -109,10 +110,10 @@ public class Repl implements NotificationHandler {
         };
     }
 
-    public void notify(ServerMessage message) {
+    public void notify(ServerMessage message) throws IOException {
         switch (message.getServerMessageType()) {
             case LOAD_GAME -> loadGame(((LoadGameMessage) message).getGameData());
-            case NOTIFICATION -> displayNotification(((NotificationMessage) message).getMessage());
+            case NOTIFICATION -> displayNotification(((NotificationMessage) message).getNotificationMessage());
             case ERROR -> displayError(((ErrorMessage) message).getErrorMessage());
         }
     }
@@ -129,7 +130,7 @@ public class Repl implements NotificationHandler {
         printPrompt();
     }
 
-    private void loadGame(GameData gameData) {
+    private void loadGame(GameData gameData) throws IOException {
         String playerColor;
         if (state == ClientState.OBSERVER) {
             playerColor = "WHITE";
